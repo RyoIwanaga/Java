@@ -55,7 +55,6 @@ public abstract class DelayedTree
 
 	public List<DelayedTree> forceBranches()
 	{
-
 		if (this.branches == null) {
 			// 現時点ではクロージャでは無く、自身のStateを参照している。
 			this.branches = this.makeBranches();
