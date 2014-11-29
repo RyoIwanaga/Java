@@ -26,7 +26,7 @@ public abstract class DelayedTree
 		this.printRec(0, limit);
 	}
 
-	public void printRec(int depth, int limit)
+	protected void printRec(int depth, int limit)
 	{
 		if (depth == limit)
 			return;
