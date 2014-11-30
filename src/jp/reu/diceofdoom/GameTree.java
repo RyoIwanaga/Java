@@ -1,4 +1,4 @@
-package DiceOfDoom;
+package jp.reu.diceofdoom;
 
 import java.util.List;
 

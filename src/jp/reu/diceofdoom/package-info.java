@@ -5,4 +5,4 @@
  * @author Administrator
  *
  */
-package DiceOfDoom;
+package jp.reu.diceofdoom;

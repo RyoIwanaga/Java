@@ -1,4 +1,4 @@
-package DiceOfDoom;
+package jp.reu.diceofdoom;
 
 import jp.reu.util.game.Game;
 

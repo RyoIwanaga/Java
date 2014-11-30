@@ -6,6 +6,7 @@ public abstract class DelayedTree
 {
 	public State state;
 	private List<DelayedTree> branches;
+	private Function f;
 
 	public DelayedTree(State state) {
 		this.state = state;
@@ -63,5 +64,7 @@ public abstract class DelayedTree
 		return this.branches;
 	}
 
-	abstract protected List<DelayedTree> makeBranches();
+	protected List<DelayedTree> makeBranches() {
+		
+	}
 }
