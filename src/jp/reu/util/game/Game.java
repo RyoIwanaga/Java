@@ -8,13 +8,13 @@ import jp.reu.util.lazy.LazyTree;
 public abstract class Game
 {
 	abstract public List<LazyTree> makeMoves(LazyGameTree tree);
-	
-	private static LazyGameTree hundleHuman(LazyGameTree tree)
+
+	protected static LazyGameTree hundleHuman(LazyGameTree tree)
 	{
 		Scanner scan;
 		int i = 0;
 		int number;
-		
+
 		LazyGameTree cast;
 
 		System.out.println("\nChoose your moves:");
@@ -27,8 +27,8 @@ public abstract class Game
 
 			i++;
 		}
-		
-		{ 
+
+		{
 			scan = new Scanner(System.in);
 			number = scan.nextInt();
 			System.out.println();
@@ -36,10 +36,10 @@ public abstract class Game
 
 		try {
 			return (LazyGameTree)tree.force().get(number);
-		} 
+		}
 		catch (IndexOutOfBoundsException e) {
 			System.out.println("\n*ouch*\n");
-			
+
 			return tree;
 		}
 	}
@@ -54,10 +54,10 @@ public abstract class Game
 			System.out.println("Game End");
 		}
 	}
-	
+
 	/*** helper ***/
-	
-	public static int nextPlayer(int player, int max) 
+
+	public static int nextPlayer(int player, int max)
 	{
 		return (player + 1) % max;
 	}
