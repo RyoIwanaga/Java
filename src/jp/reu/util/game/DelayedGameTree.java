@@ -3,6 +3,7 @@ package jp.reu.util.game;
 public abstract class DelayedGameTree extends DelayedTree
 {
 	public Action action;
+	private static Game gameRule;
 
 	public DelayedGameTree(State state) {
 		super(state);

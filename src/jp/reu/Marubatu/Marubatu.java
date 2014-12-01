@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jp.reu.util.Array;
-import jp.reu.util.game.DelayedTree;
 import jp.reu.util.game.Game;
+import jp.reu.util.game.LazyGameTree;
+import jp.reu.util.lazy.LazyTree;
 
 public class Marubatu extends Game
 {
@@ -14,23 +15,33 @@ public class Marubatu extends Game
 		'o',
 		'x',
 	};
-	
-	static List<DelayedTree> makeMoves(DelayedTree tree)
+
+	@Override
+	public List<LazyTree> makeMoves(LazyGameTree tree)
 	{
-		ArrayList<DelayedTree> moves = new ArrayList<DelayedTree>();
-		MarubatuState state = (MarubatuState)tree.state;
+		List<LazyTree> moves = new ArrayList<LazyTree>();
+		MarubatuState state = (MarubatuState)tree.getState();
+		byte[][] board = state.board;
+		int preStone = state.player == 0 ? 2 : 1;
 		byte[][] copy;
 		
-		for (int y = 0; y < state.board.length; y ++) {
-			for (int x = 0; x < state.board[0].length; x ++) {
+		/*** game end ? ***/
+		
+		if (isGameEnd(board, preStone))
+			return moves;
+		
+		/*** add place moves ***/
+		
+		for (int y = 0; y < board.length; y ++) {
+			for (int x = 0; x < board[0].length; x ++) {
 				if (state.board[y][x] == 0) {
 					// COPY
-					copy = Array.copyBB(state.board);
+					copy = Array.copyBB(board);
 					copy[y][x] = (byte)(state.player + 1);
 					
 					moves.add(
-							new GameTree(
-									new ActionPlace(x, y),
+							new LazyGameTree(
+									new ActionPlace(state.player, x, y),
 									new MarubatuState(copy, (state.player + 1) % 2)));
 				}
 			}
@@ -38,13 +49,53 @@ public class Marubatu extends Game
 
 		return moves;
 	}
+	
+	private static boolean isGameEnd(byte[][] board, int stone)
+	{
+
+		/*** SOME ***/
+		if (isGameEndTo(board, stone, 0, 0, 1, 1)
+				|| isGameEndTo(board, stone, 2, 0, -1, 1)
+				||
+				// left to right
+				isGameEndTo(board, stone, 0, 0, 1, 0)
+				|| isGameEndTo(board, stone, 0, 1, 1, 0)
+				|| isGameEndTo(board, stone, 0, 2, 1, 0)
+				||
+				// top to bottom
+				isGameEndTo(board, stone, 0, 0, 0, 1)
+				|| isGameEndTo(board, stone, 1, 0, 0, 1)
+				|| isGameEndTo(board, stone, 2, 0, 0, 1))
+			return true;
+		else
+			return false;
+	}
+
+	private static boolean isGameEndTo(byte[][] board, int stone, int x, int y,
+			int dx, int dy)
+	{
+		// Start position
+		int xx = x;
+		int yy = y;
+
+		while (xx < board[0].length && yy < board.length) {
+			if (board[yy][xx] == stone) {
+				xx += dx;
+				yy += dy;
+			} else {
+				return false;
+			}
+		}
+
+		return true;
+	}
 
 	public static void main(String[] args)
 	{
 		byte[][] board = new byte[3][3];
 		MarubatuState state = new MarubatuState(board, 0);
-		GameTree tree = new GameTree(state);
-		
-		tree.printRec(3);
+
+		LazyGameTree tree = new LazyGameTree(new Marubatu(), state);
+		play(tree);
 	}
 }

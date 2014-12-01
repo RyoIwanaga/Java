@@ -4,11 +4,13 @@ import jp.reu.util.game.Action;
 
 public class ActionPlace extends Action
 {
+	int player;
 	int x;
 	int y;
 	
-	public ActionPlace(int x, int y) {
+	public ActionPlace(int player, int x, int y) {
 		super();
+		this.player = player;
 		this.x = x;
 		this.y = y;
 	}
@@ -21,6 +23,6 @@ public class ActionPlace extends Action
 
 	public static void main(String[] args)
 	{
-		new ActionPlace(1, 2).print();
+		new ActionPlace(0, 1, 2).print();
 	}
 }

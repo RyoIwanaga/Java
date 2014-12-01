@@ -1,47 +1,64 @@
 package jp.reu.util.game;
 
+import java.util.List;
 import java.util.Scanner;
 
-public class Game
+import jp.reu.util.lazy.LazyTree;
+
+public abstract class Game
 {
-	private static DelayedGameTree hundleHuman(DelayedGameTree tree)
+	abstract public List<LazyTree> makeMoves(LazyGameTree tree);
+	
+	private static LazyGameTree hundleHuman(LazyGameTree tree)
 	{
-		Scanner scan = new Scanner(System.in);
+		Scanner scan;
 		int i = 0;
 		int number;
 		
-		DelayedGameTree t;
+		LazyGameTree cast;
 
 		System.out.println("\nChoose your moves:");
 
 		// Print actions
-		for (DelayedTree move : tree.forceBranches()) {
+		for (LazyTree move : tree.force()) {
 			System.out.print(i + ": ");
-			t = (DelayedGameTree)move;
-			t.action.print();
+			cast = (LazyGameTree)move;
+			cast.action.print();
 
 			i++;
 		}
+		
+		{ 
+			scan = new Scanner(System.in);
+			number = scan.nextInt();
+			System.out.println();
+		}
 
 		try {
-			number = scan.nextInt();
+			return (LazyGameTree)tree.force().get(number);
+		} 
+		catch (IndexOutOfBoundsException e) {
+			System.out.println("\n*ouch*\n");
 			
-			System.out.println("hhh");
-			return (DelayedGameTree)tree.forceBranches().get(number);
-			
-		} catch (Exception e) {
 			return tree;
-		} finally {
-			scan.close();
 		}
 	}
 
-	public static void play(DelayedGameTree tree)
+	public static void play(LazyGameTree tree)
 	{
 		tree.print();
 
-		if (!tree.forceBranches().isEmpty()) {
+		if (!tree.force().isEmpty()) {
 			play(hundleHuman(tree));
+		} else {
+			System.out.println("Game End");
 		}
+	}
+	
+	/*** helper ***/
+	
+	public static int nextPlayer(int player, int max) 
+	{
+		return (player + 1) % max;
 	}
 }

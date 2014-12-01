@@ -9,11 +9,16 @@ public abstract class LazyTree
 	public List<LazyTree> force()
 	{
 		if (this.branches == null) {
-			this.branches = makeNextStream();
+			this.branches = makeBranches();
 		}
 
 		return branches;
 	}
 	
-	abstract public List<LazyTree> makeNextStream();
+	abstract public List<LazyTree> makeBranches();
+
+	public boolean isForced()
+	{
+		return this.branches != null;
+	}
 }

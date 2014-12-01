@@ -16,6 +16,24 @@ public class Array
 		return copy;
 	}
 
+	public static byte[][][] copyBBB (byte[][][] arrs) {
+		int amax = arrs.length;
+		int bmax = arrs[0].length;
+		int cmax = arrs[0][0].length;
+
+		byte[][][] copy = new byte[amax][bmax][cmax];
+		
+		for (int a = 0; a < amax; a++) {
+			for (int b = 0; b < bmax; b++) {
+				for (int c = 0; c < cmax; c++) {
+					copy[a][b][c] = arrs[a][b][c];
+				}
+			}
+		}
+		
+		return copy;
+	}
+
 	public static void main(String[] args)
 	{
 		// TODO Auto-generated method stub

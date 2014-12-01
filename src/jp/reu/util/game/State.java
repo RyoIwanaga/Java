@@ -8,7 +8,7 @@ public abstract class State
 		this.print(0);
 	}
 
-	protected String makeStrDepth(int depth)
+	protected static String makeStrDepth(int depth)
 	{
 		return jp.reu.util.Str.makeStrNTimes(depth, strDepth);
 	}
