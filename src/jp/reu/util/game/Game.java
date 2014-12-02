@@ -1,5 +1,6 @@
 package jp.reu.util.game;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -7,8 +8,9 @@ import jp.reu.util.lazy.LazyTree;
 
 public abstract class Game
 {
-	public static final int PLAYER_HUMAN = 0;
-	public static final int PLAYER_COMPUTER = 1;
+	public static final int PLAY_HUMAN = 0;
+	public static final int PLAY_COMPUTER = 1;
+	public static final int PLAY_MAX = 2;
 
 	abstract public List<LazyTree> makeMoves(LazyGameTree tree);
 
@@ -46,7 +48,7 @@ public abstract class Game
 			return tree;
 		}
 	}
-	
+
 	protected static List<Integer> getRatings(LazyTree tree, int player)
 	{
 		List<Integer> lst = new ArrayList<Integer>();
@@ -58,14 +60,18 @@ public abstract class Game
 		return lst;
 	}
 
-	abstract protected int rateTree(LazyGameTree tree, int player);
-	
-	private static LazyGameTree hundleComputer(LazyGameTree tree, int player)
+	protected static int rateTree(LazyGameTree tree, int player)
+	{
+		return 0;
+	}
+
+	protected static LazyGameTree hundleComputer(LazyGameTree tree, int player)
 	{
 		List<Integer> ratings;
 		int max_index, max;
+		LazyGameTree next;
 
-		/*** Initialize ***/
+		//// Initialize ////
 
 		ratings = getRatings(tree, player);
 		max_index = 0;
@@ -78,7 +84,13 @@ public abstract class Game
 			}
 		}
 
-		return (LazyGameTree)tree.force().get(max_index);
+		next = (LazyGameTree)tree.force().get(max_index);
+
+		System.out.println();
+		next.action.print();
+		System.out.println();
+
+		return next;
 	}
 
 	public static void play(LazyGameTree tree)

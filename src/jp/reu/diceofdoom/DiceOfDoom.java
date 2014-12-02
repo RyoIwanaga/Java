@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import jp.reu.util.Array;
+import jp.reu.util.game.AI;
 import jp.reu.util.game.Game;
 import jp.reu.util.game.LazyGameTree;
 import jp.reu.util.game.State;
@@ -17,7 +18,7 @@ public class DiceOfDoom extends Game
 {
 	static final int NUM_PLAYERS = 2;
 	static final int MAX_DICE = 3;
-	static final int BOARD_SIZE = 2;
+	static final int BOARD_SIZE = 3;
 
 	@Override
 	public List<LazyTree> makeMoves(LazyGameTree tree)
@@ -184,25 +185,15 @@ public class DiceOfDoom extends Game
 
 		return winner;
 	}
-	
-	private static void printWinner(List<Integer> winner) 
-	{
-		System.out.println(winner);
-	}
-	
-	/// vs Computer
-	private static List<Integer> getRatings(LazyTree tree, int player)
-	{
-		List<Integer> lst = new ArrayList<Integer>();
 
-		for (LazyTree move : tree.force()) {
-			lst.add(rateTree((LazyGameTree)move , player));
-		}
-
-		return lst;
+	private static void printWinner(List<Integer> winner)
+	{
+		System.out.println("Win" + winner);
 	}
 
-	private static Integer rateTree(LazyGameTree tree, int player)
+	// override
+
+	protected static int rateTree(LazyGameTree tree, int player)
 	{
 		List<LazyTree> moves = tree.force();
 		List<Integer> winner;
@@ -228,18 +219,22 @@ public class DiceOfDoom extends Game
 		}
 	}
 
-	public static void play(LazyGameTree tree, int[] players)
+	public static void play(LazyGameTree tree, AI[] players)
 	{
 		int player = tree.<DODState>getState().player;
 
 		tree.print();
 
-		if (!tree.force().isEmpty()) {
+		if (tree.force().isEmpty()) {
 			printWinner(winner(tree));
-		} else if (players[player] == PLAYER_HUMAN){
-			play(hundleHuman(tree));
+		} else if (AI[player] == null){
+			play(
+				hundleHuman(tree),
+				players);
 		} else {
-			play(hundleComuter(tree));
+			play(
+				hundleComputer(tree, player),
+				players);
 		}
 	}
 
@@ -249,22 +244,6 @@ public class DiceOfDoom extends Game
 
 		LazyGameTree tree = new LazyGameTree(new DiceOfDoom(), state);
 		// tree.printRec(3);
-		play(tree);
-
-		/*
-		System.out.println("from 0:0");
-		for (Point p: collectNeighborPoints(new Point(0, 0), 3, 3))
-			System.out.println(p);
-
-		System.out.println("from 1:0");
-		for (Point p: collectNeighborPoints(new Point(0, 0), 3, 3))
-			System.out.println(p);
-
-
-		System.out.println("from 1:1");
-		for (Point p: collectNeighborPoints(new Point(1, 1), 3, 3))
-			System.out.println(p);
-			*/
-
+		play(tree, new int[]{PLAY_HUMAN, PLAY_COMPUTER});
 	}
 }
