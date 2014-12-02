@@ -1,18 +1,24 @@
 package jp.reu.util.game;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import jp.reu.util.game.ais.AI;
 import jp.reu.util.lazy.LazyTree;
+
+/**
+ * @abstract printWinner
+ */
 
 public abstract class Game
 {
-	public static final int PLAY_HUMAN = 0;
-	public static final int PLAY_COMPUTER = 1;
-	public static final int PLAY_MAX = 2;
+	abstract public List<LazyTree> makeBranches(LazyGameTree tree);
+	abstract public List<Integer> winner (LazyGameTree tree);
 
-	abstract public List<LazyTree> makeMoves(LazyGameTree tree);
+	protected void printWinner(List<Integer> winner)
+	{
+		System.out.println("Wins" + winner);
+	}
 
 	protected static LazyGameTree hundleHuman(LazyGameTree tree)
 	{
@@ -49,58 +55,26 @@ public abstract class Game
 		}
 	}
 
-	protected static List<Integer> getRatings(LazyTree tree, int player)
+	public List<Integer> play(LazyGameTree tree, AI[] ais)
 	{
-		List<Integer> lst = new ArrayList<Integer>();
+		int player = tree.getState().getPlayer();
 
-		for (LazyTree move : tree.force()) {
-			lst.add(rateTree((LazyGameTree)move , player));
-		}
-
-		return lst;
-	}
-
-	protected static int rateTree(LazyGameTree tree, int player)
-	{
-		return 0;
-	}
-
-	protected static LazyGameTree hundleComputer(LazyGameTree tree, int player)
-	{
-		List<Integer> ratings;
-		int max_index, max;
-		LazyGameTree next;
-
-		//// Initialize ////
-
-		ratings = getRatings(tree, player);
-		max_index = 0;
-		max = ratings.get(0);
-
-		for (int i = 1; i < ratings.size(); i++) {
-			if (max < ratings.get(i)) {
-				max = ratings.get(i);
-				max_index = i;
-			}
-		}
-
-		next = (LazyGameTree)tree.force().get(max_index);
-
-		System.out.println();
-		next.action.print();
-		System.out.println();
-
-		return next;
-	}
-
-	public static void play(LazyGameTree tree)
-	{
 		tree.print();
 
-		if (!tree.force().isEmpty()) {
-			play(hundleHuman(tree));
-		} else {
-			System.out.println("Game End");
+		if (tree.force().isEmpty()) {
+			this.printWinner(this.winner(tree));
+			return this.winner(tree);
+		}
+		// Play human
+		else if (ais[player] == null){
+			return this.play(
+					hundleHuman(tree),
+					ais);
+		}
+		else {
+			return this.play(
+					ais[player].hundleGameTree(tree, player),
+					ais);
 		}
 	}
 

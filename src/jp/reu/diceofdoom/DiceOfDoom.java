@@ -2,29 +2,29 @@ package jp.reu.diceofdoom;
 
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import jp.reu.util.Array;
-import jp.reu.util.game.AI;
 import jp.reu.util.game.Game;
 import jp.reu.util.game.LazyGameTree;
-import jp.reu.util.game.State;
+import jp.reu.util.game.ais.AI;
 import jp.reu.util.lazy.LazyTree;
 
 public class DiceOfDoom extends Game
 {
+	public static final DiceOfDoom instance = new DiceOfDoom();
+
 	static final int NUM_PLAYERS = 2;
 	static final int MAX_DICE = 3;
-	static final int BOARD_SIZE = 3;
+	static final int BOARD_SIZE = 2;
 
 	@Override
-	public List<LazyTree> makeMoves(LazyGameTree tree)
+	public List<LazyTree> makeBranches(LazyGameTree tree)
 	{
 		List<LazyTree> moves = new ArrayList<LazyTree>();
-		DODState state = tree.<DODState>getState();
+		StateDoD state = (StateDoD)tree.getState();
 		byte[][][] board = state.board;
 		byte[][][] boardCopy;
 		int player = state.player;
@@ -36,7 +36,7 @@ public class DiceOfDoom extends Game
 		if (!state.fFirstMove) {
 			moves.add(new LazyGameTree(
 					new ActionPass(),
-					new DODState(
+					new StateDoD(
 							addNewDice(board, player, state.spareDice),
 							nextPlayer(player, NUM_PLAYERS),
 							0,
@@ -50,7 +50,7 @@ public class DiceOfDoom extends Game
 			for (int x = 0; x < board[0].length; x++) {
 
 				// attack only from player hex
-				if (player == board[y][x][DODState.HEX_PLAYER]) {
+				if (player == board[y][x][StateDoD.HEX_PLAYER]) {
 
 					// For neighbor of player hex
 					from = new Point(x, y);
@@ -60,19 +60,19 @@ public class DiceOfDoom extends Game
 
 							// make new board
 							boardCopy = Array.copyBBB(board);
-							boardCopy[p.y][p.x][DODState.HEX_PLAYER] = (byte)player;
+							boardCopy[p.y][p.x][StateDoD.HEX_PLAYER] = (byte)player;
 							// set dice 1
-							boardCopy[y][x][DODState.HEX_DICE] = 1;
+							boardCopy[y][x][StateDoD.HEX_DICE] = 1;
 							// move dice
-							boardCopy[p.y][p.x][DODState.HEX_DICE] = (byte)(board[y][x][DODState.HEX_DICE] - 1);
+							boardCopy[p.y][p.x][StateDoD.HEX_DICE] = (byte)(board[y][x][StateDoD.HEX_DICE] - 1);
 
 							moves.add(new LazyGameTree(
 									new ActionAttack(player, from, p),
-									new DODState(
+									new StateDoD(
 											boardCopy,
 											player,
 											// add spare dice
-											state.spareDice + board[p.y][p.x][DODState.HEX_DICE],
+											state.spareDice + board[p.y][p.x][StateDoD.HEX_DICE],
 											// moved already
 											false)));
 						}
@@ -86,14 +86,18 @@ public class DiceOfDoom extends Game
 
 	public static boolean isAttackable(byte[][][] board, Point from, Point to)
 	{
-		if (board[from.y][from.x][DODState.HEX_PLAYER] != board[to.y][to.x][DODState.HEX_PLAYER] &&
-				board[from.y][from.x][DODState.HEX_DICE] > board[to.y][to.x][DODState.HEX_DICE]) {
+		if (board[from.y][from.x][StateDoD.HEX_PLAYER] != board[to.y][to.x][StateDoD.HEX_PLAYER] &&
+				board[from.y][from.x][StateDoD.HEX_DICE] > board[to.y][to.x][StateDoD.HEX_DICE]) {
 			return true;
 		} else {
 			return false;
 		}
 	}
 
+	/**
+	 * Supply dice left to right, top to botom.
+	 * @return updated board
+	 */
 	public static byte[][][] addNewDice(byte[][][] board, int player, int spareDice)
 	{
 		byte[][][] copy = Array.copyBBB(board);
@@ -105,9 +109,9 @@ public class DiceOfDoom extends Game
 				if (rest == 0) {
 					break outside;
 				}
-				else if (board[y][x][DODState.HEX_PLAYER] == player &&
-						board[y][x][DODState.HEX_DICE] < MAX_DICE) {
-					copy[y][x][DODState.HEX_DICE]++;
+				else if (board[y][x][StateDoD.HEX_PLAYER] == player &&
+						board[y][x][StateDoD.HEX_DICE] < MAX_DICE) {
+					copy[y][x][StateDoD.HEX_DICE]++;
 					rest--;
 				}
 			}
@@ -139,12 +143,13 @@ public class DiceOfDoom extends Game
 		return points;
 	}
 
-	public static List<Integer> winner(LazyGameTree tree)
+	@Override
+	public List<Integer> winner(LazyGameTree tree)
 	{
 		List<Integer[]> pairs = new ArrayList<Integer[]>();
 		List<Integer> winner = new ArrayList<Integer>();
 		int winValue;
-		DODState s = tree.<DODState>getState();
+		StateDoD s = (StateDoD)tree.getState();
 		byte[][][] board = s.board;
 
 		final int PLAYER = 0;
@@ -163,7 +168,7 @@ public class DiceOfDoom extends Game
 
 		for (int y = 0; y < board.length; y++) {
 			for (int x = 0; x < board[0].length; x++) {
-				pairs.get(board[y][x][DODState.HEX_PLAYER])[ACC]++;
+				pairs.get(board[y][x][StateDoD.HEX_PLAYER])[ACC]++;
 			}
 		}
 
@@ -186,64 +191,14 @@ public class DiceOfDoom extends Game
 		return winner;
 	}
 
-	private static void printWinner(List<Integer> winner)
-	{
-		System.out.println("Win" + winner);
-	}
-
-	// override
-
-	protected static int rateTree(LazyGameTree tree, int player)
-	{
-		List<LazyTree> moves = tree.force();
-		List<Integer> winner;
-		List<Integer> scors;
-
-		// game end ?
-		if (moves.isEmpty()) {
-			winner = winner(tree);
-
-			if (winner.contains(player)) {
-				return 100 / winner.size();
-			} else {
-				return 0;
-			}
-		} else {
-			scors = getRatings(tree, player);
-
-			if (player == tree.<DODState>getState().player) {
-				return Collections.max(scors);
-			} else {
-				return Collections.min(scors);
-			}
-		}
-	}
-
-	public static void play(LazyGameTree tree, AI[] players)
-	{
-		int player = tree.<DODState>getState().player;
-
-		tree.print();
-
-		if (tree.force().isEmpty()) {
-			printWinner(winner(tree));
-		} else if (AI[player] == null){
-			play(
-				hundleHuman(tree),
-				players);
-		} else {
-			play(
-				hundleComputer(tree, player),
-				players);
-		}
-	}
-
 	public static void main(String[] args)
 	{
-		DODState state = new DODState(BOARD_SIZE, NUM_PLAYERS, MAX_DICE);
+		StateDoD state = new StateDoD(BOARD_SIZE, NUM_PLAYERS, MAX_DICE);
 
-		LazyGameTree tree = new LazyGameTree(new DiceOfDoom(), state);
-		// tree.printRec(3);
-		play(tree, new int[]{PLAY_HUMAN, PLAY_COMPUTER});
+		LazyGameTree tree = new LazyGameTree(instance, state);
+		new DiceOfDoom().play(tree, new AI[] {
+				null,
+				new AIDoD(instance)
+		});
 	}
 }

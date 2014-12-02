@@ -4,7 +4,7 @@ package jp.reu.diceofdoom;
 import java.util.Random;
 import jp.reu.util.game.State;
 
-public class DODState extends State
+public class StateDoD extends State
 {
 	static final int HEX_PLAYER = 0;
 	static final int HEX_DICE = 1;
@@ -17,16 +17,16 @@ public class DODState extends State
 	int spareDice;
 	boolean fFirstMove;
 
-	public DODState(int size, int numPlayer, int maxDice) {
+	public StateDoD(int size, int numPlayer, int maxDice) {
+		super(0);
 		this.board = makeBoard(size, numPlayer, maxDice);
-		this.player = 0;
 		this.spareDice = 0;
 		this.fFirstMove = true;
 	}
 
-	public DODState(byte[][][] board, int player, int spare_dice, boolean fFirstMove) {
+	public StateDoD(byte[][][] board, int player, int spare_dice, boolean fFirstMove) {
+		super(player);
 		this.board = board;
-		this.player = player;
 		this.spareDice = spare_dice;
 		this.fFirstMove = fFirstMove;
 	}
@@ -83,6 +83,6 @@ public class DODState extends State
 
 	public static void main(String[] args)
 	{
-		new DODState(3, 2, 3).print();
+		new StateDoD(3, 2, 3).print();
 	}
 }

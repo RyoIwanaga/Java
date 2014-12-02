@@ -1,12 +1,20 @@
-package jp.reu.util.game;
+package jp.reu.util.game.ais;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.reu.util.game.Game;
+import jp.reu.util.game.LazyGameTree;
 import jp.reu.util.lazy.LazyTree;
 
 public abstract class AI
 {
+	public Game rule;
+
+	public AI (Game rule) {
+		this.rule = rule;
+	}
+
 	public List<Integer> getRatings(LazyTree tree, int player)
 	{
 		List<Integer> lst = new ArrayList<Integer>();
@@ -42,7 +50,7 @@ public abstract class AI
 		next = (LazyGameTree)tree.force().get(max_index);
 
 		System.out.println();
-		next.action.print();
+		next.getAction().print();
 		System.out.println();
 
 		return next;

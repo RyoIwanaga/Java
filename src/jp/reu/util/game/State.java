@@ -4,6 +4,16 @@ public abstract class State
 {
 	private static String strDepth = "_   ";
 
+	private int player;
+
+	public State (int player) {
+		this.player = player;
+	}
+
+	public int getPlayer() {
+		return this.player;
+	}
+
 	public void print() {
 		this.print(0);
 	}

@@ -20,24 +20,25 @@ public class LazyGameTree extends LazyTree
 		this.state = state;
 		this.action = action;
 	}
-	
+
 	/*** Getters ***/
 
-	public <T> T getState()
+	public State getState()
 	{
-		return (T)this.state;
+		return this.state;
 	}
 
 	public Action getAction()
 	{
 		return this.action;
 	}
-	
+
 	/*** Lazy functions ***/
 
+	@Override
 	public List<LazyTree> makeBranches()
 	{
-		return gameRule.makeMoves(this);
+		return gameRule.makeBranches(this);
 	}
 
 	public void forceRec(int depth)
