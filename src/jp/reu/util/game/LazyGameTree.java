@@ -23,9 +23,9 @@ public class LazyGameTree extends LazyTree
 	
 	/*** Getters ***/
 
-	public State getState()
+	public <T> T getState()
 	{
-		return this.state;
+		return (T)this.state;
 	}
 
 	public Action getAction()

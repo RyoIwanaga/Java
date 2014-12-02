@@ -2,6 +2,7 @@ package jp.reu.diceofdoom;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +23,7 @@ public class DiceOfDoom extends Game
 	public List<LazyTree> makeMoves(LazyGameTree tree)
 	{
 		List<LazyTree> moves = new ArrayList<LazyTree>();
-		DODState state = (DODState)tree.getState();
+		DODState state = tree.<DODState>getState();
 		byte[][][] board = state.board;
 		byte[][][] boardCopy;
 		int player = state.player;
@@ -137,12 +138,13 @@ public class DiceOfDoom extends Game
 		return points;
 	}
 
-	public static List<Integer[]> winner(State state)
+	public static List<Integer> winner(LazyGameTree tree)
 	{
-		List<Integer[]> winner = new ArrayList<Integer[]>();
-		DODState s = (DODState)state;
+		List<Integer[]> pairs = new ArrayList<Integer[]>();
+		List<Integer> winner = new ArrayList<Integer>();
+		int winValue;
+		DODState s = tree.<DODState>getState();
 		byte[][][] board = s.board;
-		int winValue = 0;
 
 		final int PLAYER = 0;
 		final int ACC = 1;
@@ -151,50 +153,93 @@ public class DiceOfDoom extends Game
 		/// Initialize
 
 		for (int i = 0; i < NUM_PLAYERS; i++) {
-			winner.add(new Integer[MAX]);
-			winner.get(i)[PLAYER] = i;
-			winner.get(i)[ACC] = 0;
+			pairs.add(new Integer[MAX]);
+			pairs.get(i)[PLAYER] = i;
+			pairs.get(i)[ACC] = 0;
 		}
 
 		/// Count occupied area of each players
 
 		for (int y = 0; y < board.length; y++) {
 			for (int x = 0; x < board[0].length; x++) {
-				winner.get(board[y][x][DODState.HEX_PLAYER])[ACC]++;
-			}
-		}
-		/*
-
-		/// Caluculate highest value
-
-		for (Integer[] item: winner) {
-			if (winValue < item[ACC]) {
-				winValue = item[ACC];
+				pairs.get(board[y][x][DODState.HEX_PLAYER])[ACC]++;
 			}
 		}
 
-		/// Remove weak item
+		/// collect win pairs
 
-		for (Integer[] item: winner) {
-			if (item[ACC] < winValue) {
-				winner.remove(item);
+		winner.add(pairs.get(0)[PLAYER]);
+		winValue = pairs.get(0)[ACC];
+		for (int i = 1; i < pairs.size(); i++) {
+			if (pairs.get(i)[ACC] == winValue) {
+				winner.add(pairs.get(0)[PLAYER]);
+			} else if (pairs.get(i)[ACC] >= winValue) {
+				winner = new ArrayList<Integer>();
+				winner.add(pairs.get(0)[PLAYER]);
+				winValue = pairs.get(0)[ACC];
+			} else {
+				continue;
 			}
-		}*/
-
-		for (Integer[] item: winner)
-			System.out.printf("%d:%d\n", item[0], item[1]);
+		}
 
 		return winner;
 	}
-
-	public static void play(LazyGameTree tree)
+	
+	private static void printWinner(List<Integer> winner) 
 	{
+		System.out.println(winner);
+	}
+	
+	/// vs Computer
+	private static List<Integer> getRatings(LazyTree tree, int player)
+	{
+		List<Integer> lst = new ArrayList<Integer>();
+
+		for (LazyTree move : tree.force()) {
+			lst.add(rateTree((LazyGameTree)move , player));
+		}
+
+		return lst;
+	}
+
+	private static Integer rateTree(LazyGameTree tree, int player)
+	{
+		List<LazyTree> moves = tree.force();
+		List<Integer> winner;
+		List<Integer> scors;
+
+		// game end ?
+		if (moves.isEmpty()) {
+			winner = winner(tree);
+
+			if (winner.contains(player)) {
+				return 100 / winner.size();
+			} else {
+				return 0;
+			}
+		} else {
+			scors = getRatings(tree, player);
+
+			if (player == tree.<DODState>getState().player) {
+				return Collections.max(scors);
+			} else {
+				return Collections.min(scors);
+			}
+		}
+	}
+
+	public static void play(LazyGameTree tree, int[] players)
+	{
+		int player = tree.<DODState>getState().player;
+
 		tree.print();
 
 		if (!tree.force().isEmpty()) {
+			printWinner(winner(tree));
+		} else if (players[player] == PLAYER_HUMAN){
 			play(hundleHuman(tree));
 		} else {
-			System.out.println(winner(tree.getState()));
+			play(hundleComuter(tree));
 		}
 	}
 
