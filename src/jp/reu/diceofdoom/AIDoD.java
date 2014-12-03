@@ -36,7 +36,7 @@ public class AIDoD extends AI
 
 			StateDoD state = (StateDoD)tree.getState();
 
-			if (player == state.player) {
+			if (player == state.getPlayer()) {
 				return Collections.max(scors);
 			} else {
 				return Collections.min(scors);

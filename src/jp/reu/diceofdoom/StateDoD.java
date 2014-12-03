@@ -1,7 +1,9 @@
 package jp.reu.diceofdoom;
 
 
+import java.util.Arrays;
 import java.util.Random;
+
 import jp.reu.util.game.State;
 
 public class StateDoD extends State
@@ -91,6 +93,53 @@ public class StateDoD extends State
 
 	public static void main(String[] args)
 	{
+
+		byte[][][] board = new byte[][][] {
+				{ {1, 3}, {1, 2}, {0, 2}, },
+				{ {0, 2}, {1, 1}, {0, 3}, },
+				{ {0, 1}, {1, 2}, {1, 2}, },
+		};
 		new StateDoD(3, 2, 3).print();
+
+		System.out.println(
+				new StateDoD(board, 2, 3).equals(new StateDoD(board, 2, 3)));
+
+		int[] hoge1 = {1, 2 ,3};
+		int[] hoge2 = {1, 2 ,3};
+
+		System.out.println(hoge1);
+		System.out.println(hoge2);
+		System.out.println(hoge1.hashCode());
+		System.out.println(hoge2.hashCode());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(this.board);
+		result = prime * result + (this.fFirstMove ? 1231 : 1237);
+		result = prime * result + this.spareDice;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (this.getClass() != obj.getClass())
+			return false;
+		StateDoD other = (StateDoD) obj;
+		if (!Arrays.deepEquals(this.board, other.board))
+			return false;
+		if (this.fFirstMove != other.fFirstMove)
+			return false;
+		if (this.spareDice != other.spareDice)
+			return false;
+		return true;
 	}
 }

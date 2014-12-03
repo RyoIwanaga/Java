@@ -84,4 +84,31 @@ public class LazyGameTree extends LazyTree
 			}
 		}
 	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.state == null) ? 0 : this.state.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (this.getClass() != obj.getClass())
+			return false;
+		LazyGameTree other = (LazyGameTree) obj;
+		if (this.state == null) {
+			if (other.state != null)
+				return false;
+		} else if (!this.state.equals(other.state))
+			return false;
+		return true;
+	}
 }

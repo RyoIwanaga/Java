@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jp.reu.util.Array;
+import jp.reu.util.Clock;
 import jp.reu.util.game.Game;
 import jp.reu.util.game.LazyGameTree;
 import jp.reu.util.game.ais.AI;
@@ -59,7 +60,8 @@ public class DiceOfDoom extends Game
 
 					// For neighbor of player hex
 					from = new Point(x, y);
-					for (Point p: memoizeCollectNeighborPoints(from)) {
+					for (Point p: collectNeighborPoints(from)) {
+//					//for (Point p: memoizeCollectNeighborPoints(from)) {
 
 						if (isAttackable(board, from, p)) {
 
@@ -203,22 +205,34 @@ public class DiceOfDoom extends Game
 	public static void main(String[] args)
 	{
 		byte[][][] board = new byte[][][] {
-				{ {1, 3}, {0, 2}, {0, 2}, },
-				{ {0, 2}, {0, 1}, {0, 1}, },
-				{ {0, 1}, {0, 2}, {1, 2}, },
+				{ {1, 3}, {1, 2}, {0, 2}, },
+				{ {0, 2}, {1, 1}, {0, 3}, },
+				{ {0, 1}, {1, 2}, {1, 2}, },
 		};
-		StateDoD state = new StateDoD(BOARD_SIZE, NUM_PLAYERS, MAX_DICE);
-//		StateDoD state = new StateDoD(board, NUM_PLAYERS, MAX_DICE);
+//		StateDoD state = new StateDoD(BOARD_SIZE, NUM_PLAYERS, MAX_DICE);
+		StateDoD state = new StateDoD(board, NUM_PLAYERS, MAX_DICE);
 //		StateDoD state = new StateDoD(board, 1, 0, true);
 
 		LazyGameTree tree = new LazyGameTree(instance, state);
 
-		new DiceOfDoom().play(
-				tree,
-				new AI[] {
-//						new AIDoD(instance),
-						null,
-						null
-				});
+		System.out.println(new LazyGameTree(instance, state).equals(
+				new LazyGameTree(instance, state)));
+
+		if (true) {
+			Clock time = new Clock();
+			tree.forceRec(12);
+			time.print("force: ");
+
+		} else {
+			new DiceOfDoom().play(
+					tree,
+					new AI[] {
+							//						new AIDoD(instance),
+							null,
+							new AIDoD(instance)
+					});
+
+		}
+
 	}
 }
