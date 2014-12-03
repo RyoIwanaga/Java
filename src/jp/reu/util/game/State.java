@@ -4,7 +4,7 @@ public abstract class State
 {
 	private static String strDepth = "_   ";
 
-	private int player;
+	protected int player;
 
 	public State (int player) {
 		this.player = player;

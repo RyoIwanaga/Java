@@ -20,7 +20,7 @@ public class DiceOfDoom extends Game
 
 	static final int NUM_PLAYERS = 2;
 	static final int MAX_DICE = 3;
-	static final int BOARD_SIZE = 2;
+	static final int BOARD_SIZE = 3;
 
 	// Memoize
 	protected static Map<Point, Set<Point>> neighborHistory = new HashMap<Point, Set<Point>>();
@@ -32,7 +32,7 @@ public class DiceOfDoom extends Game
 		StateDoD state = (StateDoD)tree.getState();
 		byte[][][] board = state.board;
 		byte[][][] boardCopy;
-		int player = state.player;
+		int player = state.getPlayer();
 
 		Point from;
 
@@ -165,43 +165,33 @@ public class DiceOfDoom extends Game
 	@Override
 	public List<Integer> winner(LazyGameTree tree)
 	{
-		List<Integer[]> pairs = new ArrayList<Integer[]>();
+		int[] scores = new int[NUM_PLAYERS];
+
 		List<Integer> winner = new ArrayList<Integer>();
 		int winValue;
 		StateDoD s = (StateDoD)tree.getState();
 		byte[][][] board = s.board;
 
-		final int PLAYER = 0;
-		final int ACC = 1;
-		final int MAX = 2;
-
-		/// Initialize
-
-		for (int i = 0; i < NUM_PLAYERS; i++) {
-			pairs.add(new Integer[MAX]);
-			pairs.get(i)[PLAYER] = i;
-			pairs.get(i)[ACC] = 0;
-		}
-
-		/// Count occupied area of each players
+		//// Count occupied area of each players ////
 
 		for (int y = 0; y < board.length; y++) {
 			for (int x = 0; x < board[0].length; x++) {
-				pairs.get(board[y][x][StateDoD.HEX_PLAYER])[ACC]++;
+				scores[board[y][x][StateDoD.HEX_PLAYER]]++;
 			}
 		}
 
-		/// collect win pairs
+		//// collect winner ////
 
-		winner.add(pairs.get(0)[PLAYER]);
-		winValue = pairs.get(0)[ACC];
-		for (int i = 1; i < pairs.size(); i++) {
-			if (pairs.get(i)[ACC] == winValue) {
-				winner.add(pairs.get(0)[PLAYER]);
-			} else if (pairs.get(i)[ACC] >= winValue) {
+		winner.add(0);
+		winValue = scores[0];
+
+		for (int i = 1; i < NUM_PLAYERS; i++) {
+			if (scores[i] == winValue) {
+				winner.add(i);
+			} else if (scores[i] > winValue) {
 				winner = new ArrayList<Integer>();
-				winner.add(pairs.get(0)[PLAYER]);
-				winValue = pairs.get(0)[ACC];
+				winner.add(i);
+				winValue = scores[i];
 			} else {
 				continue;
 			}
@@ -212,15 +202,23 @@ public class DiceOfDoom extends Game
 
 	public static void main(String[] args)
 	{
+		byte[][][] board = new byte[][][] {
+				{ {1, 3}, {0, 2}, {0, 2}, },
+				{ {0, 2}, {0, 1}, {0, 1}, },
+				{ {0, 1}, {0, 2}, {1, 2}, },
+		};
 		StateDoD state = new StateDoD(BOARD_SIZE, NUM_PLAYERS, MAX_DICE);
+//		StateDoD state = new StateDoD(board, NUM_PLAYERS, MAX_DICE);
+//		StateDoD state = new StateDoD(board, 1, 0, true);
 
 		LazyGameTree tree = new LazyGameTree(instance, state);
 
 		new DiceOfDoom().play(
 				tree,
 				new AI[] {
+//						new AIDoD(instance),
 						null,
-						new AIDoD(instance)
+						null
 				});
 	}
 }

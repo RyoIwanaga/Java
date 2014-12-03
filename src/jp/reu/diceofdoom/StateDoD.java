@@ -14,7 +14,6 @@ public class StateDoD extends State
 
 	// Array of Array of Pair of player and Dice
 	byte[][][] board;
-	int player;
 	int spareDice;
 	boolean fFirstMove;
 
@@ -24,6 +23,14 @@ public class StateDoD extends State
 		this.spareDice = 0;
 		this.fFirstMove = true;
 	}
+
+	public StateDoD(byte[][][] board, int numPlayer, int maxDice) {
+		super(0);
+		this.board = board;
+		this.spareDice = 0;
+		this.fFirstMove = true;
+	}
+
 
 	public StateDoD(byte[][][] board, int player, int spare_dice, boolean fFirstMove) {
 		super(player);
