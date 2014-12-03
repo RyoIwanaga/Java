@@ -22,6 +22,8 @@ public class AIDoD extends AI
 		List<Integer> winner;
 		List<Integer> scors;
 
+		System.out.println("hoge");
+
 		// game end ?
 		if (moves.isEmpty()) {
 			winner = this.rule.winner(tree);

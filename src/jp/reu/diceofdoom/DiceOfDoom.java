@@ -2,8 +2,10 @@ package jp.reu.diceofdoom;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import jp.reu.util.Array;
@@ -20,6 +22,9 @@ public class DiceOfDoom extends Game
 	static final int MAX_DICE = 3;
 	static final int BOARD_SIZE = 2;
 
+	// Memoize
+	protected static Map<Point, Set<Point>> neighborHistory = new HashMap<Point, Set<Point>>();
+
 	@Override
 	public List<LazyTree> makeBranches(LazyGameTree tree)
 	{
@@ -31,7 +36,7 @@ public class DiceOfDoom extends Game
 
 		Point from;
 
-		/*** Add passing moves if already moved ***/
+		//// Add passing moves if already moved ////
 
 		if (!state.fFirstMove) {
 			moves.add(new LazyGameTree(
@@ -54,7 +59,7 @@ public class DiceOfDoom extends Game
 
 					// For neighbor of player hex
 					from = new Point(x, y);
-					for (Point p: collectNeighborPoints(from, board[0].length, board.length)) {
+					for (Point p: memoizeCollectNeighborPoints(from)) {
 
 						if (isAttackable(board, from, p)) {
 
@@ -120,7 +125,7 @@ public class DiceOfDoom extends Game
 		return copy;
 	}
 
-	public static Set<Point>collectNeighborPoints(Point p, int height, int width)
+	public static Set<Point> collectNeighborPoints(Point p)
 	{
 		/*
 		 *   0:0 1:0 2:0
@@ -129,9 +134,9 @@ public class DiceOfDoom extends Game
 		 */
 		Set<Point> points = new HashSet<Point>();
 		int minx = Math.max(0, p.x - 1);
-		int maxx = Math.min(p.x + 1, width - 1);
+		int maxx = Math.min(p.x + 1, BOARD_SIZE - 1);
 		int miny = Math.max(0, p.y - 1);
-		int maxy = Math.min(p.y + 1, height - 1);
+		int maxy = Math.min(p.y + 1, BOARD_SIZE - 1);
 
 		for (int y = miny; y <= maxy; y++) {
 			for (int x = minx; x <= maxx; x++) {
@@ -141,6 +146,20 @@ public class DiceOfDoom extends Game
 		}
 
 		return points;
+	}
+
+	public static Set<Point> memoizeCollectNeighborPoints(Point p)
+	{
+		Set<Point> result;
+
+		result = neighborHistory.get(p);
+
+		if (result == null) {
+			result = collectNeighborPoints(p);
+			neighborHistory.put(p, result);
+		}
+
+		return result;
 	}
 
 	@Override
@@ -196,9 +215,12 @@ public class DiceOfDoom extends Game
 		StateDoD state = new StateDoD(BOARD_SIZE, NUM_PLAYERS, MAX_DICE);
 
 		LazyGameTree tree = new LazyGameTree(instance, state);
-		new DiceOfDoom().play(tree, new AI[] {
-				null,
-				new AIDoD(instance)
-		});
+
+		new DiceOfDoom().play(
+				tree,
+				new AI[] {
+						null,
+						new AIDoD(instance)
+				});
 	}
 }

@@ -8,7 +8,8 @@ public class StateDoD extends State
 {
 	static final int HEX_PLAYER = 0;
 	static final int HEX_DICE = 1;
-	static final int HEX = 2;
+	static final int HEX_MAX = 2;
+
 	static final char[] DISPLAY_PLAYER = {'a', 'b', 'c'};
 
 	// Array of Array of Pair of player and Dice
@@ -33,7 +34,7 @@ public class StateDoD extends State
 
 	public static byte[][][] makeBoard(int size, int numPlayer, int maxDice)
 	{
-		byte[][][] board = new byte[size][size][HEX];
+		byte[][][] board = new byte[size][size][HEX_MAX];
 		Random rnd = new Random();
 
 		for (int y = 0; y <size; y++) {
