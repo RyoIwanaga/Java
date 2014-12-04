@@ -88,24 +88,30 @@ public class AI
 		ratings = this.abGetRatings(tree, player, Integer.MIN_VALUE, Integer.MAX_VALUE);
 		max_index = 0;
 		max = ratings.get(0);
-//
-//		for (int i = 1; i < ratings.size(); i++) {
-//			if (max < ratings.get(i)) {
-//				max = ratings.get(i);
-//				max_index = i;
-//			}
-//		}
-//
-		next = (LazyGameTree)tree.force().get(max_index);
+
+		for (int i = 1; i < ratings.size(); i++) {
+			if (max < ratings.get(i)) {
+				max = ratings.get(i);
+				max_index = i;
+			}
+		}
 
 		System.out.println();
-		next.getAction().print();
+		for (int i = 0; i < ratings.size(); i++) {
+			System.out.printf("[%s] (%d) : ",
+					i == max_index ? '*' : ' ', ratings.get(i));
+			next = (LazyGameTree)tree.force().get(i);
+			next.getAction().print();
+		}
+
+		next = (LazyGameTree)tree.force().get(max_index);
+
 		System.out.println();
 
 		return next;
 	}
 
-	public List<Integer> abGetRatings(LazyGameTree tree, int player, int alpha, int beta, )
+	public List<Integer> abGetRatings(LazyGameTree tree, int player, int alpha, int beta)
 	{
 		int a = alpha;
 		int b = beta;
@@ -116,19 +122,34 @@ public class AI
 			score = this.abRateState((LazyGameTree)branche , player, a, b);
 			result.add(score);
 
-			if (result)
+			if (tree.getState().getPlayer() == player) {
+				if (score >= b) {
+					break;
+				}
 
+				a = Math.max(score, a);
 
+			} else {
+				if (score <= a) {
+					break;
+				}
+
+				a = Math.min(score, b);
+			}
 		}
-
 
 		return result;
 	}
 
 	public int abRateState(LazyGameTree tree, int player, int alpha, int beta)
 	{
-		if (!tree.isForced() || tree.isForcedTerminal()) {
+		// score state
+		if (!tree.isForced()) {
 			return this.scoreState(tree, player);
+		}
+		// score terminal
+		else if (tree.isForcedTerminal()) {
+			return this.scoreTerminal(tree, player);
 		} else {
 
 			if (tree.getState().getPlayer() == player) {

@@ -12,7 +12,7 @@ public class StateDoD extends State
 	static final int HEX_DICE = 1;
 	static final int HEX_MAX = 2;
 
-	static final char[] DISPLAY_PLAYER = {'a', 'b', 'c'};
+	static final char[] DISPLAY_PLAYER = {'a', 'b', 'c', 'd', 'e'};
 
 	// Array of Array of Pair of player and Dice
 	byte[][][] board;
@@ -62,55 +62,42 @@ public class StateDoD extends State
 	public void print(int depth)
 	{
 		System.out.print(makeStrDepth(depth));
-		System.out.printf("Current player: %s, Spare dice: %d.\n",
+		System.out.printf("Current player: %s, Spare dice: %d.\n\n",
 				DISPLAY_PLAYER[this.player], this.spareDice);
 
-		for (int y = -1; y < this.board.length; y++) {
+		int i = 0;
+
+		for (int y = 0; y < this.board.length; y++) {
 			System.out.print(makeStrDepth(depth));
 
-			System.out.printf("%s ",
-					y == -1 ? " " : Integer.toString(y));
-
 			// print blank
-			for (int n = 0; n < this.board.length - y; n ++) {
-				System.out.print(" ");
+			for (int n = 0; n < this.board.length - y - 1; n ++) {
+				System.out.print("    ");
 			}
 
 			for (int x = 0; x < this.board[0].length; x++) {
-				if (y == -1) {
-					System.out.printf("%d   ", x);
-				} else {
-				System.out.printf("%s-%d ",
+				System.out.printf("%s-%d   ",
 						DISPLAY_PLAYER[this.board[y][x][HEX_PLAYER]],
 						this.board[y][x][HEX_DICE]);
-
-				}
 			}
 
 			System.out.println();
+
+			System.out.print(makeStrDepth(depth));
+
+			// print blank
+			for (int n = 0; n < this.board.length - y - 1; n ++) {
+				System.out.print("    ");
+			}
+
+			for (int x = 0; x < this.board[0].length; x++) {
+				System.out.printf("[%2d]  ", i);
+
+				i++;
+			}
+
+			System.out.println("\n");
 		}
-	}
-
-	public static void main(String[] args)
-	{
-
-		byte[][][] board = new byte[][][] {
-				{ {1, 3}, {1, 2}, {0, 2}, },
-				{ {0, 2}, {1, 1}, {0, 3}, },
-				{ {0, 1}, {1, 2}, {1, 2}, },
-		};
-		new StateDoD(3, 2, 3).print();
-
-		System.out.println(
-				new StateDoD(board, 2, 3).equals(new StateDoD(board, 2, 3)));
-
-		int[] hoge1 = {1, 2 ,3};
-		int[] hoge2 = {1, 2 ,3};
-
-		System.out.println(hoge1);
-		System.out.println(hoge2);
-		System.out.println(hoge1.hashCode());
-		System.out.println(hoge2.hashCode());
 	}
 
 	@Override
@@ -141,5 +128,15 @@ public class StateDoD extends State
 		if (this.spareDice != other.spareDice)
 			return false;
 		return true;
+	}
+
+	public static void main(String[] args)
+	{
+		byte[][][] board = new byte[][][] {
+				{ {1, 3}, {1, 2}, {0, 2}, },
+				{ {0, 2}, {1, 1}, {0, 3}, },
+				{ {0, 1}, {1, 2}, {1, 2}, },
+		};
+		new StateDoD(3, 2, 3).print();
 	}
 }

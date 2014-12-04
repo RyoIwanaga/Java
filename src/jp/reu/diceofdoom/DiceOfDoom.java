@@ -35,15 +35,13 @@ public class DiceOfDoom extends Game
 		result = historyMakeBranches.get(tree);
 
 		if (result == null) {
-			result = makeBranchesMemo(tree);
+			result = this.makeBranchesMemo(tree);
 			historyMakeBranches.put(tree, result);
 		}
 
 		return result;
 	}
-	
-	
-	
+
 	public List<LazyTree> makeBranchesMemo(LazyGameTree tree)
 	{
 		List<LazyTree> moves = new ArrayList<LazyTree>();
@@ -90,7 +88,10 @@ public class DiceOfDoom extends Game
 							boardCopy[p.y][p.x][StateDoD.HEX_DICE] = (byte)(board[y][x][StateDoD.HEX_DICE] - 1);
 
 							moves.add(new LazyGameTree(
-									new ActionAttack(player, from, p),
+									new ActionAttack(player, from, p,
+											board.length * from.y + from.x,
+											board.length * p.y + p.x
+											),
 									new StateDoD(
 											boardCopy,
 											player,
@@ -223,9 +224,9 @@ public class DiceOfDoom extends Game
 	{
 		StateDoD state = (StateDoD)tree.getState();
 		byte[][][] board = state.board;
-		
+
 		int sum = 0;
-		
+
 		for (int y = 0; y < board.length; y++) {
 			for (int x = 0; x < board.length; x++) {
 				if (board[y][x][StateDoD.HEX_PLAYER] == player) {
@@ -235,23 +236,26 @@ public class DiceOfDoom extends Game
 				}
 			}
 		}
-		
+
 		return sum;
 	}
 
 	public static void main(String[] args)
 	{
-//		byte[][][] board = new byte[][][] {
-//				{ {1, 3}, {1, 2}, {0, 2}, },
-//				{ {0, 2}, {1, 1}, {0, 3}, },
-//				{ {0, 1}, {1, 2}, {1, 2}, },
-//		};
+		if (true) {
+
+		}
+		byte[][][] board = new byte[][][] {
+				{ {1, 3}, {1, 2}, {0, 2}, },
+				{ {0, 2}, {1, 1}, {0, 3}, },
+				{ {0, 1}, {1, 2}, {1, 2}, },
+		};
 //		StateDoD state = new StateDoD(board, NUM_PLAYERS, MAX_DICE);
 //		StateDoD state = new StateDoD(board, 1, 0, true);
 
 		StateDoD state = new StateDoD(BOARD_SIZE, NUM_PLAYERS, MAX_DICE);
 		LazyGameTree tree = new LazyGameTree(instance, state);
-		
+
 		if (false) {
 			Clock time = new Clock();
 			tree.forceRec(12);
@@ -262,11 +266,11 @@ public class DiceOfDoom extends Game
 					tree,
 					new AI[] {
 							//						new AIDoD(instance),
-							new AI(instance, 4),
-							new AI(instance, 4),
+							//new AI(instance, 4),
+							null,
+							new AI(instance, 3),
+							null,
 					});
-
 		}
-
 	}
 }
