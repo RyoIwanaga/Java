@@ -22,24 +22,23 @@ public class AI
 	
 	protected int rateTree(LazyGameTree tree, int player)
 	{
-		List<Integer> scors;
-
-		// limited tree
+		// Limited tree
 		if (!tree.isForced()) {
 			return this.scoreState(tree, player);
 		}
-		// Force and terminal
+		// Forced terminal
 		else if (tree.isForcedTerminal()) {
 			return this.scoreTerminal(tree, player);
 		}
 		// keep rating
 		else {
-			scors = this.getRatings(tree, player);
 
 			if (player == tree.getState().getPlayer()) {
-				return Collections.max(scors);
+				return Collections.max(
+						this.getRatings(tree, player));
 			} else {
-				return Collections.min(scors);
+				return Collections.min(
+						this.getRatings(tree, player));
 			}
 		}
 	}
