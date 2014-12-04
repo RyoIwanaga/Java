@@ -21,4 +21,25 @@ public abstract class LazyTree
 	{
 		return this.branches != null;
 	}
+	
+	public boolean isForcedTerminal()
+	{
+		return isForced() && branches.isEmpty();
+	}
+
+	public void forceRec()
+	{
+		for (LazyTree branch : this.force()) {
+			branch.forceRec();
+		}
+	}
+	
+	public void forceRec(int depth)
+	{
+		if (depth > 0) {
+			for (LazyTree branch : this.force()) {
+				branch.forceRec(depth - 1);
+			}
+		}
+	}
 }

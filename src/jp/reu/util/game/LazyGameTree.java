@@ -8,7 +8,7 @@ public class LazyGameTree extends LazyTree
 {
 	protected Action action;
 	protected State state;
-	private static Game gameRule;
+	protected static Game gameRule;
 
 	public LazyGameTree(Game rule, State state) {
 		this.gameRule = rule;
@@ -41,20 +41,8 @@ public class LazyGameTree extends LazyTree
 		return gameRule.makeBranches(this);
 	}
 
-	public void forceRec(int depth)
-	{
-		LazyGameTree gameTree;
-
-		if (depth > 0) {
-			for (LazyTree branch : this.force()) {
-				gameTree = (LazyGameTree) branch;
-				gameTree.forceRec(depth - 1);
-			}
-		}
-	}
-
-	/*** Print ***/
-
+	//// Printer ////
+	
 	public void print()
 	{
 		this.print(0);
@@ -65,6 +53,26 @@ public class LazyGameTree extends LazyTree
 		this.state.print(depth);
 	}
 
+	public void printForcedBranches()
+	{
+		printForcedBranches(0);
+	}
+
+	public void printForcedBranches(int depth)
+	{
+		LazyGameTree gameTree;
+		
+		this.print(depth);
+		System.out.println();
+
+		if (this.isForced()) {
+			for (LazyTree branch : this.force()) {
+				gameTree = (LazyGameTree) branch;
+				gameTree.printForcedBranches(depth + 1);
+			}
+		}
+	}
+
 	public void printRec(int limit)
 	{
 		this.printRec(0, limit);
@@ -73,10 +81,11 @@ public class LazyGameTree extends LazyTree
 	public void printRec(int depth, int limit)
 	{
 		LazyGameTree gameTree;
+		
+		this.print(depth);
+		System.out.println();
 
-		if (depth < limit) {
-			this.print(depth);
-			System.out.println();
+		if (depth < limit && this.isForced()) {
 
 			for (LazyTree branch : this.force()) {
 				gameTree = (LazyGameTree) branch;

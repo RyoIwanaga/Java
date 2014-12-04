@@ -24,10 +24,27 @@ public class DiceOfDoom extends Game
 	static final int BOARD_SIZE = 3;
 
 	// Memoize
-	protected static Map<Point, Set<Point>> neighborHistory = new HashMap<Point, Set<Point>>();
+	protected static Map<LazyGameTree, List<LazyTree>> historyMakeBranches = new HashMap<LazyGameTree, List<LazyTree>>();
+	protected static Map<Point, Set<Point>> historyNeighbor = new HashMap<Point, Set<Point>>();
 
 	@Override
 	public List<LazyTree> makeBranches(LazyGameTree tree)
+	{
+		List<LazyTree> result;
+
+		result = historyMakeBranches.get(tree);
+
+		if (result == null) {
+			result = makeBranchesMemo(tree);
+			historyMakeBranches.put(tree, result);
+		}
+
+		return result;
+	}
+	
+	
+	
+	public List<LazyTree> makeBranchesMemo(LazyGameTree tree)
 	{
 		List<LazyTree> moves = new ArrayList<LazyTree>();
 		StateDoD state = (StateDoD)tree.getState();
@@ -61,7 +78,6 @@ public class DiceOfDoom extends Game
 					// For neighbor of player hex
 					from = new Point(x, y);
 					for (Point p: collectNeighborPoints(from)) {
-//					//for (Point p: memoizeCollectNeighborPoints(from)) {
 
 						if (isAttackable(board, from, p)) {
 
@@ -127,7 +143,7 @@ public class DiceOfDoom extends Game
 		return copy;
 	}
 
-	public static Set<Point> collectNeighborPoints(Point p)
+	public static Set<Point> collectNeighborPointsMemo(Point p)
 	{
 		/*
 		 *   0:0 1:0 2:0
@@ -150,15 +166,15 @@ public class DiceOfDoom extends Game
 		return points;
 	}
 
-	public static Set<Point> memoizeCollectNeighborPoints(Point p)
+	public static Set<Point> collectNeighborPoints(Point p)
 	{
 		Set<Point> result;
 
-		result = neighborHistory.get(p);
+		result = historyNeighbor.get(p);
 
 		if (result == null) {
-			result = collectNeighborPoints(p);
-			neighborHistory.put(p, result);
+			result = collectNeighborPointsMemo(p);
+			historyNeighbor.put(p, result);
 		}
 
 		return result;
@@ -202,34 +218,52 @@ public class DiceOfDoom extends Game
 		return winner;
 	}
 
+	@Override
+	public int scoreState(LazyGameTree tree, int player)
+	{
+		StateDoD state = (StateDoD)tree.getState();
+		byte[][][] board = state.board;
+		
+		int sum = 0;
+		
+		for (int y = 0; y < board.length; y++) {
+			for (int x = 0; x < board.length; x++) {
+				if (board[y][x][StateDoD.HEX_PLAYER] == player) {
+					sum += board[y][x][StateDoD.HEX_DICE];
+				} else {
+					sum -= board[y][x][StateDoD.HEX_DICE];
+				}
+			}
+		}
+		
+		return sum;
+	}
+
 	public static void main(String[] args)
 	{
-		byte[][][] board = new byte[][][] {
-				{ {1, 3}, {1, 2}, {0, 2}, },
-				{ {0, 2}, {1, 1}, {0, 3}, },
-				{ {0, 1}, {1, 2}, {1, 2}, },
-		};
-//		StateDoD state = new StateDoD(BOARD_SIZE, NUM_PLAYERS, MAX_DICE);
-		StateDoD state = new StateDoD(board, NUM_PLAYERS, MAX_DICE);
+//		byte[][][] board = new byte[][][] {
+//				{ {1, 3}, {1, 2}, {0, 2}, },
+//				{ {0, 2}, {1, 1}, {0, 3}, },
+//				{ {0, 1}, {1, 2}, {1, 2}, },
+//		};
+//		StateDoD state = new StateDoD(board, NUM_PLAYERS, MAX_DICE);
 //		StateDoD state = new StateDoD(board, 1, 0, true);
 
+		StateDoD state = new StateDoD(BOARD_SIZE, NUM_PLAYERS, MAX_DICE);
 		LazyGameTree tree = new LazyGameTree(instance, state);
-
-		System.out.println(new LazyGameTree(instance, state).equals(
-				new LazyGameTree(instance, state)));
-
-		if (true) {
+		
+		if (false) {
 			Clock time = new Clock();
 			tree.forceRec(12);
 			time.print("force: ");
 
-		} else {
+		} else if (true) {
 			new DiceOfDoom().play(
 					tree,
 					new AI[] {
 							//						new AIDoD(instance),
-							null,
-							new AIDoD(instance)
+							new AI(instance, 4),
+							new AI(instance, 4),
 					});
 
 		}

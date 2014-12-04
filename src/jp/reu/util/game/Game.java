@@ -14,6 +14,7 @@ public abstract class Game
 {
 	abstract public List<LazyTree> makeBranches(LazyGameTree tree);
 	abstract public List<Integer> winner (LazyGameTree tree);
+	abstract public int scoreState (LazyGameTree tree, int player);
 
 	protected void printWinner(List<Integer> winner)
 	{
@@ -78,7 +79,7 @@ public abstract class Game
 		}
 	}
 
-	/*** helper ***/
+	//// helper ////
 
 	public static int nextPlayer(int player, int max)
 	{

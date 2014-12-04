@@ -1,18 +1,47 @@
 package jp.reu.util.game.ais;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import jp.reu.util.game.Game;
 import jp.reu.util.game.LazyGameTree;
 import jp.reu.util.lazy.LazyTree;
 
-public abstract class AI
+public class AI
 {
+	public static final int LEVEL_MAX = -1;
 	public Game rule;
+	// force depth
+	public int level;
 
-	public AI (Game rule) {
+	public AI (Game rule, int level) {
 		this.rule = rule;
+		this.level = level;
+	}
+	
+	protected int rateTree(LazyGameTree tree, int player)
+	{
+		List<Integer> scors;
+
+		// limited tree
+		if (!tree.isForced()) {
+			return this.scoreState(tree, player);
+		}
+		// Force and terminal
+		else if (tree.isForcedTerminal()) {
+			return this.scoreTerminal(tree, player);
+		}
+		// keep rating
+		else {
+			scors = this.getRatings(tree, player);
+
+			if (player == tree.getState().getPlayer()) {
+				return Collections.max(scors);
+			} else {
+				return Collections.min(scors);
+			}
+		}
 	}
 
 	public List<Integer> getRatings(LazyTree tree, int player)
@@ -25,8 +54,22 @@ public abstract class AI
 
 		return lst;
 	}
+	
+	public int scoreTerminal(LazyGameTree tree, int player) 
+	{
+		List<Integer> winner = rule.winner(tree);
+		
+		if (winner.contains(player)) {
+			return Integer.MAX_VALUE / winner.size();
+		} else {
+			return Integer.MIN_VALUE;
+		}
+	}
 
-	abstract protected int rateTree(LazyGameTree tree, int player);
+	public int scoreState (LazyGameTree tree, int player)
+	{
+		return rule.scoreState(tree, player);
+	}
 
 	public LazyGameTree hundleGameTree(LazyGameTree tree, int player)
 	{
@@ -34,8 +77,14 @@ public abstract class AI
 		int max_index, max;
 		LazyGameTree next;
 
-		//// Initialize ////
-
+		//// Force ////
+		
+		if (this.level == LEVEL_MAX) {
+			tree.forceRec();
+		} else {
+			tree.forceRec(this.level);
+		}
+		
 		ratings = this.getRatings(tree, player);
 		max_index = 0;
 		max = ratings.get(0);
