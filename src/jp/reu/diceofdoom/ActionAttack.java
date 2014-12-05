@@ -32,9 +32,5 @@ public class ActionAttack extends Action
 
 	public static void main(String[] args)
 	{
-		new ActionAttack(
-				0,
-				new Point(1, 2),
-				new Point(2, 3)).print();
 	}
 }
