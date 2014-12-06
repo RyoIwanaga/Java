@@ -17,39 +17,39 @@ public class Marubatu extends Game
 	};
 
 	@Override
-	public List<LazyTree> makeMoves(LazyGameTree tree)
+	public List<LazyTree> makeBranches(LazyGameTree tree)
 	{
 		List<LazyTree> moves = new ArrayList<LazyTree>();
-		MarubatuState state = (MarubatuState)tree.getState();
+		StateMarubatu state = (StateMarubatu)tree.getState();
 		byte[][] board = state.board;
 		int preStone = state.player == 0 ? 2 : 1;
 		byte[][] copy;
-		
+
 		/*** game end ? ***/
-		
+
 		if (isGameEnd(board, preStone))
 			return moves;
-		
+
 		/*** add place moves ***/
-		
+
 		for (int y = 0; y < board.length; y ++) {
 			for (int x = 0; x < board[0].length; x ++) {
 				if (state.board[y][x] == 0) {
 					// COPY
 					copy = Array.copyBB(board);
 					copy[y][x] = (byte)(state.player + 1);
-					
+
 					moves.add(
 							new LazyGameTree(
 									new ActionPlace(state.player, x, y),
-									new MarubatuState(copy, (state.player + 1) % 2)));
+									new StateMarubatu(copy, (state.player + 1) % 2)));
 				}
 			}
 		}
 
 		return moves;
 	}
-	
+
 	private static boolean isGameEnd(byte[][] board, int stone)
 	{
 
@@ -90,12 +90,25 @@ public class Marubatu extends Game
 		return true;
 	}
 
+	@Override
+	public List<Integer> winner(LazyGameTree tree)
+	{
+	}
+
+	@Override
+	public int scoreState(LazyGameTree tree, int player)
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 	public static void main(String[] args)
 	{
 		byte[][] board = new byte[3][3];
-		MarubatuState state = new MarubatuState(board, 0);
+		StateMarubatu state = new StateMarubatu(board, 0);
 
 		LazyGameTree tree = new LazyGameTree(new Marubatu(), state);
-		play(tree);
+		this.play(tree);
 	}
+
 }

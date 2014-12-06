@@ -1,17 +1,19 @@
-package jp.reu.reverse;
+package jp.reu.reversi;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 import java.util.Scanner;
 
-import jp.reu.util.game.DelayedTree;
+import jp.reu.util.game.Game;
+import jp.reu.util.game.LazyGameTree;
 import jp.reu.util.game.State;
+import jp.reu.util.game.ais.AI;
+import jp.reu.util.lazy.LazyTree;
 
-class Reverse
+class Reversi extends Game
 {
-	static final int PLAYER_HUMAN = 0;
-	static final int PLAYER_COMPUTER = 1;
+	public static final Reversi instance = new Reversi();
 
 	static final int STONE_NONE = 0;
 	static final int STONE_BLACK = 1;
@@ -21,83 +23,21 @@ class Reverse
 
 	static final char[] DISPLAY = { '□', '●', '○' };
 
-	public static void main(String[] args)
+
+	@Override
+	public List<LazyTree> makeBranches(LazyGameTree tree)
 	{
-		byte[][] board = makeBoard(4);
-		State state = new ReverseState(board, 0, false);
-
-		GameTree tree = new GameTree(state);
-
-		//tree.printRec(2);
-		play(tree, PLAYER_HUMAN, PLAYER_HUMAN);
-		// play(tree, PLAYER_HUMAN, PLAYER_COMPUTER);
-		//play(tree, PLAYER_COMPUTER, PLAYER_HUMAN);
-	}
-
-	public static void printBoard(byte[][] board)
-	{
-		printBoard(board, 0);
-	}
-
-	public static void printBoard(byte[][] board, int depth)
-	{
-
-		for (int y = -1; y < board.length; y++) {
-
-			System.out.println();
-			Util.printDepth(depth);
-
-			for (int x = -1; x < board[0].length; x++) {
-
-				// blank
-				if (x == -1 && y == -1) {
-					System.out.print("  ");
-					continue;
-				}
-				// x軸を出力
-				else if (y == -1) {
-					System.out.printf("%2d", x);
-					continue;
-				} else if (x == -1) {
-					System.out.printf("%2d", y);
-					continue;
-				}
-
-				// DISPLAY STONE or NO STONE
-				System.out.print(DISPLAY[board[y][x]]);
-			}
-		}
-	}
-
-	/*** Game Tree ***/
-
-	public static byte[][] makeBoard(int size)
-	{
-		int harf = size / 2;
-		byte[][] board = new byte[size][size];
-
-		board[harf - 1][harf - 1] = STONE_BLACK;
-		board[harf][harf] = STONE_BLACK;
-
-		board[harf][harf - 1] = STONE_WHITE;
-		board[harf - 1][harf] = STONE_WHITE;
-
-		return board;
-	}
-
-	static List<DelayedTree> makeMoves(State stateAbs)
-	{
-		List<DelayedTree> moves = new ArrayList<DelayedTree>();
-		ReverseState state = (ReverseState)stateAbs;
-		ReverseState new_state;
-		GameTree move;
+		List<LazyTree> moves = new ArrayList<LazyTree>();
+		StateReversi state = (StateReversi)tree.getState();
+		StateReversi new_state;
+		LazyTree move;
 
 		byte[][] board = state.board;
 		int width = board[0].length;
 		int height = board.length;
 		byte[][] copy;
 
-		int player = state.player;
+		int player = state.getPlayer();
 		int my = player + 1;
 		int opp = (player + 1) % 2 + 1;
 
@@ -110,8 +50,9 @@ class Reverse
 					copy = copyBoard(board);
 
 					if (desReverse(copy, height, width, x, y, my, opp) > 0) {
-						new_state = new ReverseState(copy, (player + 1) % 2, false);
-						move = new GameTree(new Action(player, x, y), new_state);
+						new_state = new StateReversi(copy, (player + 1) % 2, false,
+								state.turn + 1);
+						move = new LazyGameTree(new ActionPlace(player, x, y), new_state);
 
 						moves.add(move);
 					}
@@ -130,8 +71,12 @@ class Reverse
 				// 一度目のパス
 			} else {
 				copy = copyBoard(board);
-				new_state = new ReverseState(copy, (player + 1) % 2, true);
-				move = new GameTree(new Action(player, -1, -1), new_state);
+				new_state = new StateReversi(copy, (player + 1) % 2, true,
+						state.turn + 1);
+				move = new LazyGameTree(
+						new ActionPass(player),
+						new_state
+						);
 
 				moves.add(move);
 			}
@@ -141,8 +86,6 @@ class Reverse
 
 		return moves;
 	}
-
-	/*** Reverse ***/
 
 	private static int desReverse(byte[][] board, int height, int width, int x, int y, int my,
 			int opp)
@@ -283,68 +226,14 @@ class Reverse
 		return copy;
 	}
 
-	/*** PLAY ***/
-
-	private static GameTree hundleHuman(GameTree tree)
+	@Override
+	public List<Integer> winner(LazyGameTree tree)
 	{
-		Scanner scan = new Scanner(System.in);
-		int i = 0;
-		int number;
-
-		GameTree t;
-
-		System.out.println("\nChoose your moves:");
-
-		// Print actions
-		for (DelayedTree move : tree.forceBranches()) {
-			System.out.print(i + ": ");
-			t = (GameTree)move;
-			t.action.print();
-
-			i++;
-		}
-
-		try {
-			number = scan.nextInt();
-			return (GameTree)tree.forceBranches().get(number);
-		} catch (Exception e) {
-			return tree;
-		}
-	}
-
-	private static GameTree hundleComputer(GameTree tree)
-	{
-		List<Integer> ratings;
-		int max_index, max;
-
-		/*** Force ***/
-
-		tree.desForce(AI_LEVEL);
-
-		/*** Initialize ***/
-
-		ratings = getRatings(tree, tree.getState().player);
-		max_index = 0;
-		max = ratings.get(0);
-
-		for (int i = 1; i < ratings.size(); i++) {
-			if (max < ratings.get(i)) {
-				max = ratings.get(i);
-				max_index = i;
-			}
-		}
-
-		return (GameTree)tree.forceBranches().get(max_index);
-	}
-
-	/**
-	 * @return 0: even, 1: p1 win, 2: p2 win
-	 */
-	private static int winners(ReverseState state)
-	{
+		List<Integer> win = new ArrayList<Integer>();
 		int count_p1 = 0;
 		int count_p2 = 0;
 
+		StateReversi state = (StateReversi)tree.getState();
 		byte[][] board = state.board;
 
 		for (int y = 0; y < board.length; y++) {
@@ -363,93 +252,109 @@ class Reverse
 		}
 
 		if (count_p1 == count_p2) {
-			return 0;
+			win.add(0);
+			win.add(1);
 		} else if (count_p1 > count_p2) {
-			return 1;
+			win.add(0);
 		} else {
-			return 2;
-		}
-	}
-
-	private static void printWinner(int w)
-	{
-		System.out.println();
-
-		switch (w) {
-		case 0:
-			System.out.println("Even:");
-			break;
-		case 1:
-		case 2:
-			System.out.printf("Player %s WIN!!", DISPLAY[w]);
-			break;
-		}
-	}
-
-	private static List<Integer> getRatings(GameTree tree, int player)
-	{
-		List<Integer> lst = new ArrayList<Integer>();
-
-		for (DelayedTree move : tree.forceBranches()) {
-			lst.add(rateTree((GameTree)move , player));
+			win.add(1);
 		}
 
-		return lst;
+		return win;
 	}
 
-	private static Integer rateTree(GameTree tree, int player)
+	@Override
+	public int scoreState(LazyGameTree tree, int player)
 	{
-		List<DelayedTree> moves = tree.forceBranches();
-		int win;
-		List<Integer> scors;
+		final int[][] scoreTable = {
+				{ 30, -12,  0, -1, -1,  0, -12,  30},
+				{-12, -15, -3, -3, -3, -3, -15, -12},
+				{  0,  -3,  0, -1, -1,  0,  -3,   0},
+				{ -1,  -3, -1, -1, -1, -1,  -3,  -1},
+				{ -1,  -3, -1, -1, -1, -1,  -3,  -1},
+				{  0,  -3,  0, -1, -1,  0,  -3,   0},
+				{-12, -15, -3, -3, -3, -3, -15, -12},
+				{ 30, -12,  0, -1, -1,  0, -12,  30},
+		};
 
-		// game end ?
-		if (moves.isEmpty()) {
-			win = winners(tree.getState());
+		StateReversi state = (StateReversi)tree.getState();
+		byte[][] board = state.board;
+		int sum = 0;
 
-			if (win == 0) {
-				return 0;
-			} else if (win == player + 1) {
-				return 1;
-			} else {
-				return -1;
+		for (int y = 0; y < board.length; y++) {
+			for (int x = 0; x < board[0].length; x++) {
+
+				if (state.turn > 35) {
+					// blank
+					if (board[y][x] == STONE_NONE) {
+						continue;
+					}
+					// my
+					else if (board[y][x] == player + 1) {
+						sum += 100;
+					}
+					// enemy stone
+					else {
+						sum -= 100;
+					}
+				} else {
+					// blank
+					if (board[y][x] == STONE_NONE) {
+						continue;
+					}
+					// my
+					else if (board[y][x] == player + 1) {
+						sum += scoreTable[y][x];
+					}
+					// enemy stone
+					else {
+						sum += scoreTable[y][x] * -1;
+					}
+				}
 			}
-		} else {
-			scors = getRatings(tree, player);
+		}
 
-			if (player == tree.getState().player) {
-				return Collections.max(scors);
-			} else {
-				return Collections.min(scors);
+		return sum;
+	}
+
+	public static void main(String[] args)
+	{
+		// State state = new StateReversi(8);
+
+		String[] boardStr = {
+				"□□○○○○○○",
+				"□□○○●●□□",
+				"●○●●○●○○",
+				"○○●●●●●●",
+				"○○●●○●●○",
+				"○○●●●●○○",
+				"□□●●○○□□",
+				"□□□□●○□□",
+		};
+		byte[][] board = new byte[8][8];
+		char c;
+
+		for (int y = 0; y < board.length; y++) {
+			for (int x = 0; x < board[0].length; x++) {
+				c = boardStr[y].charAt(x);
+
+				if (c == StateReversi.DISPLAY[0]) {
+					board[y][x] = STONE_NONE;
+				}
+				else if (c == StateReversi.DISPLAY[1]) {
+					board[y][x] = STONE_BLACK;
+				} else {
+					board[y][x] = STONE_WHITE;
+				}
 			}
 		}
 
-	}
+		State state = new StateReversi(board, 0, false, 47);
+		LazyGameTree tree = new LazyGameTree(instance, state);
 
-	public static void play(GameTree tree, int p1, int p2)
-	{
-		int player = tree.getState().player;
-		GameTree nextMove;
-
-		tree.print();
-
-		if (tree.forceBranches().isEmpty()) {
-			printWinner(winners(tree.getState()));
-
-		} else {
-			if (player == 0 && p1 == PLAYER_HUMAN)
-				nextMove = hundleHuman(tree);
-
-			else if (player == 1 && p2 == PLAYER_HUMAN)
-				nextMove = hundleHuman(tree);
-
-			else if (player == 0 && p1 == PLAYER_COMPUTER)
-				nextMove = hundleComputer(tree);
-
-			else
-				nextMove = hundleComputer(tree);
-
-			play(nextMove, p1, p2);
-		}
+		new Reversi().play(tree, new AI[] {
+				null,
+				new AI(instance, 7),
+		});
 	}
 }

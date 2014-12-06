@@ -42,7 +42,7 @@ public class LazyGameTree extends LazyTree
 	}
 
 	//// Printer ////
-	
+
 	public void print()
 	{
 		this.print(0);
@@ -55,13 +55,13 @@ public class LazyGameTree extends LazyTree
 
 	public void printForcedBranches()
 	{
-		printForcedBranches(0);
+		this.printForcedBranches(0);
 	}
 
 	public void printForcedBranches(int depth)
 	{
 		LazyGameTree gameTree;
-		
+
 		this.print(depth);
 		System.out.println();
 
@@ -81,7 +81,7 @@ public class LazyGameTree extends LazyTree
 	public void printRec(int depth, int limit)
 	{
 		LazyGameTree gameTree;
-		
+
 		this.print(depth);
 		System.out.println();
 

@@ -59,9 +59,9 @@ public class AI
 		List<Integer> winner = this.rule.winner(tree);
 
 		if (winner.contains(player)) {
-			return Integer.MAX_VALUE / winner.size();
+			return (Integer.MAX_VALUE - 1000) / winner.size();
 		} else {
-			return Integer.MIN_VALUE;
+			return Integer.MIN_VALUE + 1000;
 		}
 	}
 
