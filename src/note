@@ -1,0 +1,15 @@
+# Vrapper
+http://vrapper.sourceforge.net/update-site/stable
+
+# EGit
+http://download.eclipse.org/egit/updates
+https://github.com/RyoIwanaga/Java.git
+
+# ADT Plugin
+http://dl-ssl.google.com/android/eclipse
+
+
+Preference -> General -> Workspace -> UTF-8 text encoding
+
+Key
+	Delete ctrl+h ctrl+d ctrl+v

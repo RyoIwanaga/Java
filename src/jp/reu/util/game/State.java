@@ -18,9 +18,9 @@ public abstract class State
 		this.print(0);
 	}
 
-	protected static String makeStrDepth(int depth)
+	protected static void printDepth(int depth)
 	{
-		return jp.reu.util.Str.makeStrNTimes(depth, strDepth);
+		System.out.print(jp.reu.util.Str.makeStrNTimes(depth, strDepth));
 	}
 
 	abstract public void print(int depth);

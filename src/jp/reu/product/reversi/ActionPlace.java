@@ -1,4 +1,4 @@
-package jp.reu.reversi;
+package jp.reu.product.reversi;
 
 import jp.reu.util.game.Action;
 

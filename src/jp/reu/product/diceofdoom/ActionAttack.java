@@ -1,4 +1,4 @@
-package jp.reu.diceofdoom;
+package jp.reu.product.diceofdoom;
 
 import java.awt.Point;
 

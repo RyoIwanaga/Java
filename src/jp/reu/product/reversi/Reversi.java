@@ -1,9 +1,7 @@
-package jp.reu.reversi;
+package jp.reu.product.reversi;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Collections;
-import java.util.Scanner;
 
 import jp.reu.util.game.Game;
 import jp.reu.util.game.LazyGameTree;
