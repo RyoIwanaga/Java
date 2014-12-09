@@ -13,3 +13,6 @@ Preference -> General -> Workspace -> UTF-8 text encoding
 
 Key
 	Delete ctrl+h ctrl+d ctrl+v
+	
+	next error ctrl + . 
+	previous error ctrl + , 

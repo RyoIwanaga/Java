@@ -51,7 +51,7 @@ public class StateReversi extends State
 	public void printPlayer(int depth)
 	{
 		System.out.println();
-		System.out.print(makeStrDepth(depth));
+		printDepth(depth);
 
 		System.out.printf("[%2d] Current player is %s.\n",
 				this.turn,
@@ -61,8 +61,7 @@ public class StateReversi extends State
 	public void printBoard(int depth)
 	{
 		for (int y = -1; y < this.board.length; y++) {
-
-			System.out.print(makeStrDepth(depth));
+			printDepth(depth);
 
 			for (int x = -1; x < this.board[0].length; x++) {
 

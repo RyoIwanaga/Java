@@ -1,4 +1,4 @@
-package jp.reu.Marubatu;
+package jp.reu.product.marubatu;
 
 import jp.reu.util.game.State;
 
@@ -20,11 +20,11 @@ public class StateMarubatu extends State
 	@Override
 	public void print(int depth)
 	{
-		System.out.print(makeStrDepth(depth));
+		printDepth(depth);
 		System.out.printf("Current player is %s \n", Marubatu.DISPLAY[this.player + 1]);
 
 		for (int y=0; y<this.board.length; y++) {
-			System.out.print(makeStrDepth(depth));
+			printDepth(depth);
 
 			for (int x=0; x<this.board[0].length; x++) {
 				System.out.print(Marubatu.DISPLAY[this.board[y][x]]);

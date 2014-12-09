@@ -1,4 +1,4 @@
-package jp.reu.Marubatu;
+package jp.reu.product.marubatu;
 
 import jp.reu.util.game.Action;
 

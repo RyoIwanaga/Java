@@ -1,4 +1,4 @@
-package jp.reu.Marubatu;
+package jp.reu.product.marubatu;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.List;
 import jp.reu.util.Array;
 import jp.reu.util.game.Game;
 import jp.reu.util.game.LazyGameTree;
+import jp.reu.util.game.ais.AI;
 import jp.reu.util.lazy.LazyTree;
 
 public class Marubatu extends Game
@@ -93,6 +94,10 @@ public class Marubatu extends Game
 	@Override
 	public List<Integer> winner(LazyGameTree tree)
 	{
+		List<Integer> win = new ArrayList<Integer>();
+		win.add(0);
+		// TODO Auto-generated method stub
+		return win;
 	}
 
 	@Override
@@ -108,7 +113,9 @@ public class Marubatu extends Game
 		StateMarubatu state = new StateMarubatu(board, 0);
 
 		LazyGameTree tree = new LazyGameTree(new Marubatu(), state);
-		this.play(tree);
+		new Marubatu().play(tree, new AI [] {
+				null,
+				null
+		});
 	}
-
 }

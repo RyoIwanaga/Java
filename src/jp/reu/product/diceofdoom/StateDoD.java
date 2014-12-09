@@ -61,14 +61,14 @@ public class StateDoD extends State
 	@Override
 	public void print(int depth)
 	{
-		System.out.print(makeStrDepth(depth));
+		printDepth(depth);
 		System.out.printf("Current player: %s, Spare dice: %d.\n\n",
 				DISPLAY_PLAYER[this.player], this.spareDice);
 
 		int i = 0;
 
 		for (int y = 0; y < this.board.length; y++) {
-			System.out.print(makeStrDepth(depth));
+			printDepth(depth);
 
 			// print blank
 			for (int n = 0; n < this.board.length - y - 1; n ++) {
@@ -83,7 +83,7 @@ public class StateDoD extends State
 
 			System.out.println();
 
-			System.out.print(makeStrDepth(depth));
+			printDepth(depth);
 
 			// print blank
 			for (int n = 0; n < this.board.length - y - 1; n ++) {
