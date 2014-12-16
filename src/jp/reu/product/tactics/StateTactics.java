@@ -14,25 +14,36 @@ public class StateTactics extends State {
 	// List of all units include dead unit
 	List<Unit> units;
 	// initiative list
-	List<Unit> wait0;
+	List<Integer> wait0;
 	// initiative list of wait unit of this turn
-	List<Unit> wait1;
+	List<Integer> wait1;
 	
-	public StateTactics(int boardWidth, int boardHeight, List<Unit> units) {
+	public StateTactics(int boardWidth, int boardHeight, List<Unit> units, List<Integer> wait0, List<Integer> wait1) {
 		super(-1);
 		
 		this.boardWidth = boardWidth;
 		this.boardHeight = boardHeight;
 		this.units = units;
-		this.wait0 = Tactics.makeWaitList(units);
+		this.wait0 = wait0;
+		this.wait1 = wait1;
 	}
-	
-	public Unit getActiveUnit() {
-		if (wait0 != null) {
+
+	public StateTactics(int boardWidth, int boardHeight, List<Unit> units) {
+		this(boardWidth, boardHeight, units, 
+				Tactics.makeWaitList(units), null);
+	}
+
+	public int getActiveUnitIndex()
+	{
+		if (wait0 != null) { 
 			return wait0.get(0);
 		} else {
 			return wait1.get(0);
 		}
+	}
+	
+	public Unit getActiveUnit() {
+		return units.get(getActiveUnitIndex());
 	}
 	
 	/**
@@ -45,7 +56,7 @@ public class StateTactics extends State {
 
 	@Override
 	public void print(int depth) {
-		int i = 0;
+		int n = 3;
 
 		printDepth(depth);
 		System.out.println("=== Active unit ===");
@@ -56,35 +67,63 @@ public class StateTactics extends State {
 		
 		/*** board ***/
 		
-		for (int y = 0; y < this.getBoardHeight() * 2; y++) {
+		for (int y = 0; y < this.getBoardHeight() * n; y++) {
 			
 			printDepth(depth);
+			if (y%n == n-1) {
+				System.out.println();
+				continue;
+			}
 				
+			label1:
 			for (int x = 0; x < this.getBoardWidth(); x++) {
 				
+				// Draw unit
 				for (Unit u : units) {
-				
-					// unit
-					if (u.getX() == x && u.getY() == y/2) {
-						System.out.print("o");
-					}
-					// no unit
-					else {
-						System.out.print("x");
+					
+					if (u.getX() == x && u.getY() == y/n) {
+						if (y%n == 0) {
+							System.out.printf("%-5s",
+								u.name);
+						} else {
+							System.out.printf("%d|%3d",
+								u.owner, u.hp);
+						}
+						System.out.print(" ");
+						continue label1;
 					}
 				}
+				
+				// Draw Floor
+				if (y%n == 0) {
+					System.out.print(".    ");
+				} else {
+					System.out.print("     ");
+				}
+				System.out.print(" ");
 			}
 			System.out.println();
 		}
 		System.out.println();
 		
+		/*** units list ***/
+		
+		printDepth(depth);
+		System.out.println("=== Unit List ===");
+		for (Unit u : units) {
+			printDepth(depth);
+			u.print();
+		}
+		
+		System.out.println();
+
 		/*** wait list ***/
 		
 		printDepth(depth);
 		System.out.println("=== Wait List ===");
-		for (Unit unit : wait0) {
+		for (int unitIndex : wait0) {
 			printDepth(depth);
-			unit.print();
+			units.get(unitIndex).print();
 		}
 		
 		System.out.println();
@@ -98,13 +137,14 @@ public class StateTactics extends State {
 		return this.boardHeight;
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) 
+	{
 		List<Unit> units = new ArrayList<Unit>();
 		units.add(new Unit("01", 10, 3, 1, 4, 0, new Point(1, 1)));
-		units.add(new Unit("02", 10, 3, 1, 4, 0, new Point(2, 2)));
+		units.add(new Unit("02", 10, 3, 1, 4, 1, new Point(2, 2)));
 		units.add(new Unit("03", 10, 3, 1, 5, 0, new Point(3, 3)));
 		
-		new StateTactics(12, 10, units).print();
-		new StateTactics(12, 10, units).print(2);
+		new StateTactics(9, 5, units).print();
+		new StateTactics(9, 5, units).print(2);
 	}
 }

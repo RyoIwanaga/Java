@@ -6,7 +6,7 @@ http://download.eclipse.org/egit/updates
 https://github.com/RyoIwanaga/Java.git
 
 # ADT Plugin
-http://dl-ssl.google.com/android/eclipse
+https://dl-ssl.google.com/android/eclipse
 
 
 Preference -> General -> Workspace -> UTF-8 text encoding
@@ -16,3 +16,8 @@ Key
 	
 	next error ctrl + . 
 	previous error ctrl + , 
+	
+SDK のリビジョンを下げる	
+http://note.chiebukuro.yahoo.co.jp/detail/n262323	
+SDK 22.3 
+	22.6 はバグあり 

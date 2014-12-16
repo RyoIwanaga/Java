@@ -33,7 +33,7 @@ public abstract class Game
 
 		// Print actions
 		for (LazyTree move : tree.force()) {
-			System.out.print(i + ": ");
+			System.out.printf("%2d: ", i);
 			cast = (LazyGameTree)move;
 			cast.action.print();
 
@@ -56,6 +56,11 @@ public abstract class Game
 		}
 	}
 
+	public List<Integer> play(LazyGameTree tree)
+	{
+		return play(tree, null);
+	}
+	
 	public List<Integer> play(LazyGameTree tree, AI[] ais)
 	{
 		int player = tree.getState().getPlayer();
@@ -67,7 +72,7 @@ public abstract class Game
 			return this.winner(tree);
 		}
 		// Play human
-		else if (ais[player] == null){
+		else if (ais == null || ais[player] == null){
 			return this.play(
 					hundleHuman(tree),
 					ais);
