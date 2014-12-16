@@ -5,22 +5,33 @@ import java.awt.Point;
 import jp.reu.product.tactics.units.Unit;
 import jp.reu.util.game.Action;
 
-public class ActionAttackMelee extends Action 
+public class ActionAttackMelee extends Action
 {
+	protected String text;
+
 	Unit unit;
 	Unit target;
 	Point attackFrom;
-	
-	public ActionAttackMelee(Unit unit, Unit target, Point attackFrom) {
+	int damage;
+
+	public ActionAttackMelee(Unit unit, Unit target, Point attackFrom, int damage) {
 		this.unit = unit;
 		this.target = target;
 		this.attackFrom = attackFrom;
+		this.damage = damage;
+		this.text = "Attack";
 	}
 
 	@Override
 	public void print() {
-		System.out.printf("\"%s\" attack \"%s\" from (%d %d)\n",
-				unit.name, target.name, 
-				attackFrom.x, attackFrom.y);
+		System.out.printf("%s [%d %d]%s %d hp from (%d %d), %d damage.\n",
+				this.text,
+				this.target.pos.x,
+				this.target.pos.y,
+				this.target.name,
+				this.target.hp,
+				this.attackFrom.x,
+				this.attackFrom.y,
+				this.damage);
 	}
 }

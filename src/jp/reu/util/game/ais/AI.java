@@ -150,8 +150,8 @@ public class AI
 		// score terminal
 		else if (tree.isForcedTerminal()) {
 			return this.scoreTerminal(tree, player);
-		} else {
-
+		}
+		else {
 			if (tree.getState().getPlayer() == player) {
 				return Collections.max(
 						this.abGetRatings(tree, player, alpha, beta));
