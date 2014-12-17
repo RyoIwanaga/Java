@@ -13,11 +13,15 @@ Preference -> General -> Workspace -> UTF-8 text encoding
 
 Key
 	Delete ctrl+h ctrl+d ctrl+v
-	
-	next error ctrl + . 
-	previous error ctrl + , 
-	
-SDK のリビジョンを下げる	
-http://note.chiebukuro.yahoo.co.jp/detail/n262323	
-SDK 22.3 
-	22.6 はバグあり 
+
+	next error ctrl + .
+	previous error ctrl + ,
+
+SDK のリビジョンを下げる
+http://note.chiebukuro.yahoo.co.jp/detail/n262323
+SDK 22.3
+	22.6 はバグあり
+
+SELECT 従業員表.所属コード, Count(従業員表.所属コード) AS 所属コードのカウント
+FROM 従業員表
+GROUP BY 従業員表.所属コード;
