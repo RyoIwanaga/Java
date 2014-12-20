@@ -298,8 +298,8 @@ public class Tactics extends Game
 		StateTactics state = new StateTactics(8, 5, units);
 		LazyGameTree tree = new LazyGameTree(Tactics.INSTANCE, state);
 		new Tactics().play(tree, new AI[] {
-				new AI(INSTANCE, 4),
-				new AI(INSTANCE, 4)
+				new AI(INSTANCE, 3),
+				new AI(INSTANCE, 3)
 		});
 	}
 }

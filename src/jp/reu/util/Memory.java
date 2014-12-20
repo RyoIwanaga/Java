@@ -1,5 +1,7 @@
 package jp.reu.util;
 
+import java.awt.Point;
+
 public class Memory
 {
 	//// singleton ////
@@ -57,32 +59,45 @@ public class Memory
 		return String.format("MEMORY used / total: %d / %d (%.2f%%) ", 
 				getUsed(), getTotal(),
 				(float)getUsed() * 100f / (float)getTotal());
-	}	
+	}
+	
+	public void print()
+	{
+		System.out.println(this);
+	}
 	
 	
 
-    public static void main(String[] args){
-        Runtime r = Runtime.getRuntime() ;//現在のJavaアプリケーションに関連したRuntimeオブジェクトを返す
-        System.out.println("Total JVM Memory:" + Memory.getInstance().getTotal()) ;
-        System.out.println("Total JVM Memory:" + Memory.getInstance()) ;
-        System.out.println("Max JVM Memory:" + Memory.getInstance().getMax()) ;
-        System.out.println("Before Memory = " + Memory.getInstance().getFree()) ;
-        System.out.println("Used Before Memory = " + Memory.getInstance().getUsed()) ;
-        System.out.println("Used Before Memory = " + Memory.getInstance().getTotalFree()) ;
-        java.util.Date d = null ;
-            d = new java.util.Date() ;
-        System.out.println("Total JVM Memory:" + Memory.getInstance()) ;
-        for(int i = 0 ; i < 10000 ; i++){
-            d = new java.util.Date() ;
-            d = null ;
-        }
-        System.out.println("Used Before Memory = " + Memory.getInstance()) ;
-        System.out.println("After Memory = " + r.freeMemory()) ;
-        System.out.println("Used After Memory = " + Memory.getInstance().getUsed()) ;
-        r.gc() ;
-        System.out.println("Used Before Memory = " + Memory.getInstance()) ;
-        System.out.println("After GC Memory = " + r.freeMemory()) ;
-        System.out.println("Used After GC Memory = " + (r.totalMemory() - r.freeMemory())) ;
+    public static void main(String[] args) {
+    	class Chain
+    	{
+    		Chain next;
+    		Point p;
+    	}
+    	
+    	Chain c1;
+    	
+    	Memory.getInstance().print();
+    	
+    	c1 = new Chain();
+    	
+    	Memory.getInstance().print();
+    	
+    	for (int i = 0; i < 1000; i ++) 
+    	{
+    		c1.p = new Point(i, i * i);
+    		c1.next = new Chain();
+    		
+    		c1 = c1.next;
+	
+    		Memory.getInstance().desGC();
+    		Memory.getInstance().print();
+    	}
+    	
+//    	c1 = null;
+//    	c2 = null;
+//    	
+//    	Memory.getInstance().print();
     }
 }
 
