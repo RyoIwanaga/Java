@@ -7,8 +7,8 @@ import java.util.List;
 import jp.reu.product.tactics.StateTactics;
 import jp.reu.product.tactics.Tactics;
 import jp.reu.product.tactics.actions.ActionAttackRaged;
-import jp.reu.util.Lists;
 import jp.reu.util.game.LazyGameTree;
+import jp.reu.util.lists.Lists;
 
 public class UnitRanged extends Unit
 {
@@ -18,7 +18,7 @@ public class UnitRanged extends Unit
 	}
 
 	@Override
-	public List<LazyGameTree> collectRangedAttackResult (StateTactics oldState)
+	public List<LazyGameTree> collectRangedAttack (StateTactics oldState)
 	{
 		List<LazyGameTree> result = new ArrayList<LazyGameTree>();
 		Unit newFromUnit, newTargetUnit;

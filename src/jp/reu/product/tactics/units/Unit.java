@@ -3,16 +3,19 @@ package jp.reu.product.tactics.units;
 import java.awt.Point;
 import java.lang.Thread.State;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import jp.reu.product.tactics.StateTactics;
 import jp.reu.product.tactics.Tactics;
+import jp.reu.product.tactics.util;
 import jp.reu.product.tactics.actions.ActionAttackMelee;
-import jp.reu.util.Lists;
 import jp.reu.util.game.Clone;
 import jp.reu.util.game.LazyGameTree;
+import jp.reu.util.lists.Identifer;
+import jp.reu.util.lists.Lists;
 
 public class Unit implements Cloneable, Clone<Unit> {
 
@@ -92,9 +95,9 @@ public class Unit implements Cloneable, Clone<Unit> {
 		return this.owner != u.owner;
 	}
 
-	public boolean isAttackAble(Unit u)
+	public boolean isAttackAble(Unit target)
 	{
-		return this.isEnemyUnit(u) && u.isNotDead();
+		return this.isEnemyUnit(target) && target.isNotDead();
 	}
 
 	public boolean isRanged()
@@ -130,7 +133,34 @@ public class Unit implements Cloneable, Clone<Unit> {
 		return this.damage;
 	}
 
-	public List<LazyGameTree> collectRangedAttackResult (StateTactics oldState)
+	public List<LazyGameTree> collectAttackMeleeFromHere (StateTactics s)
+	{
+		List<LazyGameTree> acc = new ArrayList<LazyGameTree>();
+		int targetIndex;
+		
+		// collect neighbor
+		Set<Point> neighbors = Tactics.collectRange(
+				s.getActiveUnit().pos,
+				1,
+				s.getBoardWidth(),
+				s.getBoardHeight());
+
+		// For neighbors
+		for (Point p : neighbors) {
+			targetIndex = s.getUnits().indexOf(
+					util.findAttackableUnit(s.getUnits(), p, s.getActiveUnit()));
+
+			// find it!
+			if (targetIndex >= 0) {
+				acc.add(this.attackMelee(
+						s.getUnits(), s.getActiveUnitIndex(), targetIndex, s));
+			}
+		}
+		
+		return acc;
+	}
+
+	public List<LazyGameTree> collectRangedAttack (StateTactics oldState)
 	{
 		return new ArrayList<LazyGameTree>();
 	}

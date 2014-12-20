@@ -1,4 +1,4 @@
-package jp.reu.util;
+package jp.reu.util.lists;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,6 +89,30 @@ public class Lists
 		}
 		
 		return copy;
+	}
+	
+	public static <E> List<E> filter(List<E> elements, Identifer<E> fn) 
+	{
+		List<E> acc = new ArrayList<E>();
+		
+		for (E o : elements) {
+			if (fn.is(o)) {
+				acc.add(o);
+			}
+		}
+		
+		return acc;
+	}
+
+	public static <E> E find1(List<E> elements, Identifer<E> fn) 
+	{
+		for (E o : elements) {
+			if (fn.is(o)) {
+				return o;
+			}
+		}
+		
+		return null;
 	}
 	
 	

@@ -9,13 +9,14 @@ import java.util.Set;
 
 import jp.reu.product.tactics.actions.*;
 import jp.reu.product.tactics.units.*;
-import jp.reu.util.Lists;
+import jp.reu.util.Memory;
 import jp.reu.util.game.ActionPass;
 import jp.reu.util.game.Game;
 import jp.reu.util.game.LazyGameTree;
 import jp.reu.util.game.Range;
 import jp.reu.util.game.ais.AI;
 import jp.reu.util.lazy.LazyTree;
+import jp.reu.util.lists.Lists;
 
 public class Tactics extends Game
 {
@@ -51,86 +52,66 @@ public class Tactics extends Game
 		boolean isSurrounded = activeUnit.isSurrounded(
 				state.getUnits(), state.getBoardWidth(), state.getBoardHeight());
 
-		//// Add Move and Melee attack ////
+//		//// Add Move and Melee attack ////
+//
+//		newPoints = collectRange(
+//				activeUnit.pos,
+//				activeUnit.speed,
+//				state.getBoardWidth(),
+//				state.getBoardHeight());
+//
+//		// Filter point of units
+//		newPoints.removeAll(collectUnitPoints(state.getUnits()));
+//
+//		// for movable points
+//		for (Point p : newPoints) {
+//
+//			//// Add Move action ////
+//
+//			newUnits = this.makeMovedUnits(state.getUnits(), state.getActiveUnitIndex(), p);
+//			newState = nextTurn(state, newUnits);
+//
+//			// add move action
+//			resultMoves.add(new LazyGameTree(new ActionMove(activeUnit, activeUnit.pos, p),
+//					newState));
+//
+//
+//			//// Add Melee attack action ////
+//
+//			// Skip if unit is ranged and is not surrounded
+//			if (activeUnit.isRanged() && !isSurrounded) continue;
+//
+//			movedUnit = newUnits.get(state.getActiveUnitIndex());
+//			neighbors = collectRange(
+//					movedUnit.pos,
+//					1,
+//					state.getBoardWidth(),
+//					state.getBoardHeight());
+//
+//			// For neighbors
+//			for (Point pAttack : neighbors) {
+//				attackTartgetIndex = findEnemyUnitIndex(newUnits, pAttack, activeUnit.owner);
+//
+//				// find it!
+//				if (attackTartgetIndex >= 0 &&
+//						movedUnit.isAttackAble(newUnits.get(attackTartgetIndex))) {
+//					result.add(
+//							// attack from active moved unit
+//							newUnits.get(activeUnitIndex).attackMelee(
+//									newUnits, activeUnitIndex, attackTartgetIndex, state));
+//				}
+//			}
+//		}
 
-		newPoints = collectRange(
-				activeUnit.pos,
-				activeUnit.speed,
-				state.getBoardWidth(),
-				state.getBoardHeight());
+		// Add Melee attack from current position
+		result.addAll(activeUnit.collectAttackMeleeFromHere(state));
 
-		// Filter point of units
-		newPoints.removeAll(collectUnitPoints(state.getUnits()));
-
-		// for movable points
-		for (Point p : newPoints) {
-
-			//// Add Move action ////
-
-			newUnits = this.makeMovedUnits(state.getUnits(), state.getActiveUnitIndex(), p);
-			newState = nextTurn(state, newUnits);
-
-			// add move action
-			resultMoves.add(new LazyGameTree(new ActionMove(activeUnit, activeUnit.pos, p),
-					newState));
-
-
-			//// Add Melee attack action ////
-
-			// Skip if unit is ranged and is not surrounded
-			if (activeUnit.isRanged() && !isSurrounded) continue;
-
-			movedUnit = newUnits.get(state.getActiveUnitIndex());
-			neighbors = collectRange(
-					movedUnit.pos,
-					1,
-					state.getBoardWidth(),
-					state.getBoardHeight());
-
-			// For neighbors
-			for (Point pAttack : neighbors) {
-				attackTartgetIndex = findEnemyUnitIndex(newUnits, pAttack, activeUnit.owner);
-
-				// find it!
-				if (attackTartgetIndex >= 0 &&
-						movedUnit.isAttackAble(newUnits.get(attackTartgetIndex))) {
-					result.add(
-							// attack from active moved unit
-							newUnits.get(activeUnitIndex).attackMelee(
-									newUnits, activeUnitIndex, attackTartgetIndex, state));
-				}
-			}
-		}
-
-		//// Add Melee attack action from current position ////
-
-		neighbors = collectRange(
-				activeUnit.pos,
-				1,
-				state.getBoardWidth(),
-				state.getBoardHeight());
-
-		// For neighbors
-		for (Point target : neighbors) {
-			attackTartgetIndex = findEnemyUnitIndex(state.getUnits(), target, activeUnit.owner);
-
-			// find it!
-			if (attackTartgetIndex >= 0 &&
-					activeUnit.isAttackAble(state.getUnits().get(attackTartgetIndex))) {
-
-				result.add(
-						// attack from active moved unit
-						activeUnit.attackMelee(
-								state.getUnits(), activeUnitIndex, attackTartgetIndex, state));
-			}
-		}
-
-		//// Add Ranged attack if possible ////
-
-		if (activeUnit.isRanged() && !isSurrounded) {
-			result.addAll(
-					activeUnit.collectRangedAttackResult(state));
-		}
+//		//// Add Ranged attack if possible ////
+//
+//		if (activeUnit.isRanged() && !isSurrounded) {
+//			result.addAll(
+//					activeUnit.collectRangedAttack(state));
+//		}
 
 		//// Marge move branches to main
 
@@ -278,22 +259,34 @@ public class Tactics extends Game
 
 		return score;
 	}
+	
+	@Override
+	public List<Integer> play(LazyGameTree tree, AI[] ais)
+	{
+		Memory.getInstance().print();
+		// TODO Auto-generated method stub
+		return super.play(tree, ais);
+	}
 
 	public static void main(String[] args)
 	{
 		List<Unit> units = new ArrayList<Unit>();
 
-		units.add(new UnitFootman(0, new Point(1, 0)));
-		units.add(new UnitFootman(0, new Point(1, 2)));
-		units.add(new UnitFootman(0, new Point(1, 4)));
-		units.add(new UnitArcher(0, new Point(0, 1)));
-		units.add(new UnitArcher(0, new Point(0, 3)));
-
-		units.add(new UnitFootman(1, new Point(6, 0)));
-		units.add(new UnitFootman(1, new Point(6, 2)));
-		units.add(new UnitFootman(1, new Point(6, 4)));
-		units.add(new UnitArcher(1, new Point(7, 1)));
-		units.add(new UnitArcher(1, new Point(7, 3)));
+		units.add(new UnitFootman(0, new Point(0, 0)));
+		units.add(new UnitFootman(0, new Point(1, 1)));
+		units.add(new UnitFootman(1, new Point(1, 0)));
+		units.add(new UnitFootman(1, new Point(0, 1)));
+//		units.add(new UnitFootman(0, new Point(1, 0)));
+//		units.add(new UnitFootman(0, new Point(1, 2)));
+//		units.add(new UnitFootman(0, new Point(1, 4)));
+//		units.add(new UnitArcher(0, new Point(0, 1)));
+//		units.add(new UnitArcher(0, new Point(0, 3)));
+//
+//		units.add(new UnitFootman(1, new Point(6, 0)));
+//		units.add(new UnitFootman(1, new Point(6, 2)));
+//		units.add(new UnitFootman(1, new Point(6, 4)));
+//		units.add(new UnitArcher(1, new Point(7, 1)));
+//		units.add(new UnitArcher(1, new Point(7, 3)));
 
 		StateTactics state = new StateTactics(8, 5, units);
 		LazyGameTree tree = new LazyGameTree(Tactics.INSTANCE, state);
