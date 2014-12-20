@@ -49,25 +49,25 @@ public class Tactics extends Game
 		//// is surrounded ? ////
 
 		boolean isSurrounded = activeUnit.isSurrounded(
-				state.units, state.boardWidth, state.boardWidth);
+				state.getUnits(), state.getBoardWidth(), state.getBoardHeight());
 
 		//// Add Move and Melee attack ////
 
 		newPoints = collectRange(
 				activeUnit.pos,
 				activeUnit.speed,
-				state.boardWidth,
-				state.boardHeight);
+				state.getBoardWidth(),
+				state.getBoardHeight());
 
 		// Filter point of units
-		newPoints.removeAll(collectUnitPoints(state.units));
+		newPoints.removeAll(collectUnitPoints(state.getUnits()));
 
 		// for movable points
 		for (Point p : newPoints) {
 
 			//// Add Move action ////
 
-			newUnits = this.makeMovedUnits(state.units, state.getActiveUnitIndex(), p);
+			newUnits = this.makeMovedUnits(state.getUnits(), state.getActiveUnitIndex(), p);
 			newState = nextTurn(state, newUnits);
 
 			// add move action
@@ -84,8 +84,8 @@ public class Tactics extends Game
 			neighbors = collectRange(
 					movedUnit.pos,
 					1,
-					state.boardWidth,
-					state.boardHeight);
+					state.getBoardWidth(),
+					state.getBoardHeight());
 
 			// For neighbors
 			for (Point pAttack : neighbors) {
@@ -107,21 +107,21 @@ public class Tactics extends Game
 		neighbors = collectRange(
 				activeUnit.pos,
 				1,
-				state.boardWidth,
-				state.boardHeight);
+				state.getBoardWidth(),
+				state.getBoardHeight());
 
 		// For neighbors
 		for (Point target : neighbors) {
-			attackTartgetIndex = findEnemyUnitIndex(state.units, target, activeUnit.owner);
+			attackTartgetIndex = findEnemyUnitIndex(state.getUnits(), target, activeUnit.owner);
 
 			// find it!
 			if (attackTartgetIndex >= 0 &&
-					activeUnit.isAttackAble(state.units.get(attackTartgetIndex))) {
+					activeUnit.isAttackAble(state.getUnits().get(attackTartgetIndex))) {
 
 				result.add(
 						// attack from active moved unit
 						activeUnit.attackMelee(
-								state.units, activeUnitIndex, attackTartgetIndex, state));
+								state.getUnits(), activeUnitIndex, attackTartgetIndex, state));
 			}
 		}
 
@@ -141,7 +141,7 @@ public class Tactics extends Game
 
 		result.add(new LazyGameTree(
 				new ActionPass(),
-				nextTurn(state, state.units)));
+				nextTurn(state, state.getUnits())));
 
 		return result;
 	}
@@ -210,7 +210,7 @@ public class Tactics extends Game
 
 	public static StateTactics nextTurn(StateTactics state, List<Unit> units)
 	{
-		List<Integer> newWaitList = new ArrayList<Integer>(state.wait0);
+		List<Integer> newWaitList = new ArrayList<Integer>(state.getWait0());
 
 		// remove first index
 		newWaitList.remove(0);
@@ -220,7 +220,7 @@ public class Tactics extends Game
 		}
 
 		return new StateTactics(
-				state.boardWidth, state.boardHeight,
+				state.getBoardWidth(), state.getBoardHeight(),
 				units,
 				newWaitList, null); // TODO パス後のリストの生成
 
@@ -242,7 +242,7 @@ public class Tactics extends Game
 
 		out:
 		for (int p = 0; p < MAX_UNIT_OWNER; p++) {
-			for (Unit u : state.units) {
+			for (Unit u : state.getUnits()) {
 				if (p == u.owner) {
 					if (u.isDead()) {
 						// keep looping
@@ -268,7 +268,7 @@ public class Tactics extends Game
 		StateTactics state = (StateTactics) tree.getState();
 		int score = 0;
 
-		for (Unit u : state.units) {
+		for (Unit u : state.getUnits()) {
 			if (u.owner == player) {
 				score += u.hp;
 			} else {
@@ -298,8 +298,8 @@ public class Tactics extends Game
 		StateTactics state = new StateTactics(8, 5, units);
 		LazyGameTree tree = new LazyGameTree(Tactics.INSTANCE, state);
 		new Tactics().play(tree, new AI[] {
-				null,
-				new AI(INSTANCE, 3)
+				new AI(INSTANCE, 4),
+				new AI(INSTANCE, 4)
 		});
 	}
 }

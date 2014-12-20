@@ -22,7 +22,7 @@ public class UnitRanged extends Unit
 	{
 		List<LazyGameTree> result = new ArrayList<LazyGameTree>();
 		Unit newFromUnit, newTargetUnit;
-		List<Unit> units = oldState.units;
+		List<Unit> units = oldState.getUnits();
 		List<Unit> newUnits;
 
 		for (int targetIndex = 0; targetIndex < units.size(); targetIndex++) {

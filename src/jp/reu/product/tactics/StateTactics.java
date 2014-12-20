@@ -8,16 +8,16 @@ import jp.reu.util.game.State;
 import jp.reu.product.tactics.units.Unit;
 import jp.reu.product.tactics.units.UnitFootman;
 
-public class StateTactics extends State {
-
-	int boardWidth, boardHeight;
+public class StateTactics extends State 
+{
+	final private int boardWidth, boardHeight;
 
 	// List of all units include dead unit
-	public List<Unit> units;
+	final private List<Unit> units;
 	// initiative list
-	List<Integer> wait0;
+	final private List<Integer> wait0;
 	// initiative list of wait unit of this turn
-	List<Integer> wait1;
+	final private List<Integer> wait1;
 
 	public StateTactics(int boardWidth, int boardHeight, List<Unit> units, List<Integer> wait0, List<Integer> wait1) {
 		super(-1);
@@ -32,6 +32,33 @@ public class StateTactics extends State {
 	public StateTactics(int boardWidth, int boardHeight, List<Unit> units) {
 		this(boardWidth, boardHeight, units,
 				Tactics.makeWaitList(units), null);
+	}
+	
+	//// Getter ////
+
+	public int getBoardWidth()
+	{
+		return this.boardWidth;
+	}
+
+	public int getBoardHeight()
+	{
+		return this.boardHeight;
+	}
+
+	public List<Unit> getUnits()
+	{
+		return this.units;
+	}
+
+	public List<Integer> getWait0()
+	{
+		return this.wait0;
+	}
+
+	public List<Integer> getWait1()
+	{
+		return this.wait1;
 	}
 
 	public int getActiveUnitIndex()
@@ -53,7 +80,9 @@ public class StateTactics extends State {
 	@Override
 	public int getPlayer() {
 		return this.getActiveUnit().owner;
-	};
+	}
+	
+	////
 
 	@Override
 	public void print(int depth) {
@@ -129,13 +158,6 @@ public class StateTactics extends State {
 		System.out.println();
 	}
 
-	public int getBoardWidth() {
-		return this.boardWidth;
-	}
-
-	public int getBoardHeight() {
-		return this.boardHeight;
-	}
 
 	public static void main(String[] args)
 	{
