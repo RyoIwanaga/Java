@@ -1,12 +1,12 @@
 package jp.reu.product.tactics.units;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
 import jp.reu.product.tactics.StateTactics;
 import jp.reu.product.tactics.Tactics;
 import jp.reu.product.tactics.actions.ActionAttackRaged;
+import jp.reu.util.diagram.Point;
 import jp.reu.util.game.LazyGameTree;
 import jp.reu.util.lists.Lists;
 

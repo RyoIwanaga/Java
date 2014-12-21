@@ -1,7 +1,7 @@
 package jp.reu.product.tactics;
 
-import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -9,6 +9,7 @@ import java.util.Set;
 
 import jp.reu.product.tactics.units.*;
 import jp.reu.util.Memory;
+import jp.reu.util.diagram.Point;
 import jp.reu.util.game.Game;
 import jp.reu.util.game.LazyGameTree;
 import jp.reu.util.game.Range;
@@ -22,6 +23,8 @@ public class Tactics extends Game
 	public static final Game INSTANCE = new Tactics();
 
 	protected static final int MAX_UNIT_OWNER = 2;
+	
+	public LazyGameTree currentNode;
 
 	@Override
 	public List<LazyTree> makeBranches(LazyGameTree tree)
@@ -231,6 +234,18 @@ public class Tactics extends Game
 		Memory.getInstance().desGC(); Memory.getInstance().print();
 		// TODO Auto-generated method stub
 		return super.play(tree, ais);
+	}
+	
+	private Tactics() 
+	{ 
+		super();
+	}
+	
+	public Tactics(int width, int height, Unit[] units)
+	{
+		currentNode = new LazyGameTree(
+				Tactics.INSTANCE,
+				new StateTactics(width, height, Arrays.asList(units)));
 	}
 
 	public static void main(String[] args)

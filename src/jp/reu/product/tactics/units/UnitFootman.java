@@ -1,6 +1,6 @@
 package jp.reu.product.tactics.units;
 
-import java.awt.Point;
+import jp.reu.util.diagram.Point;
 
 public class UnitFootman extends Unit
 {

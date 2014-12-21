@@ -1,9 +1,9 @@
 package jp.reu.product.tactics;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.reu.util.diagram.Point;
 import jp.reu.util.game.State;
 import jp.reu.product.tactics.units.Unit;
 import jp.reu.product.tactics.units.UnitFootman;

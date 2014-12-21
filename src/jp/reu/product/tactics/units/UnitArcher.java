@@ -1,6 +1,7 @@
 package jp.reu.product.tactics.units;
 
-import java.awt.Point;
+import jp.reu.util.diagram.Point;
+
 
 public class UnitArcher extends UnitRanged
 {
@@ -15,7 +16,6 @@ public class UnitArcher extends UnitRanged
 				2,
 				// initiative
 				8,
-
 				owner, pos);
 	}
 }

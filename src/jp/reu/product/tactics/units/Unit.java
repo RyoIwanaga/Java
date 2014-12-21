@@ -1,6 +1,5 @@
 package jp.reu.product.tactics.units;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -8,7 +7,7 @@ import java.util.Set;
 import jp.reu.product.tactics.StateTactics;
 import jp.reu.product.tactics.Tactics;
 import jp.reu.product.tactics.actions.ActionAttackMelee;
-import jp.reu.product.tactics.actions.ActionMove;
+import jp.reu.util.diagram.Point;
 import jp.reu.util.game.ActionPass;
 import jp.reu.util.game.Clone;
 import jp.reu.util.game.LazyGameTree;
