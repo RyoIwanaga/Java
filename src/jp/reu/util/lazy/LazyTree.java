@@ -15,6 +15,11 @@ public abstract class LazyTree
 		return branches;
 	}
 	
+	public void desDelete() 
+	{
+		branches = null;
+	}
+	
 	abstract public List<LazyTree> makeBranches();
 
 	public boolean isForced()

@@ -18,38 +18,38 @@ public class UnitRanged extends Unit
 	}
 
 	@Override
-	public List<LazyGameTree> collectRangedAttack (StateTactics oldState)
+	public List<LazyGameTree> collectRangedAttack (StateTactics s)
 	{
-		List<LazyGameTree> result = new ArrayList<LazyGameTree>();
+		List<LazyGameTree> acc = new ArrayList<LazyGameTree>();
 		Unit newFromUnit, newTargetUnit;
-		List<Unit> units = oldState.getUnits();
+		List<Unit> units = s.getUnits();
 		List<Unit> newUnits;
 
 		for (int targetIndex = 0; targetIndex < units.size(); targetIndex++) {
 
 			// is enemy?
-			if (units.get(targetIndex).isEnemyUnit(oldState.getPlayer()) &&
+			if (units.get(targetIndex).isEnemyUnit(s.getPlayer()) &&
 					this.isAttackAble(units.get(targetIndex))) {
 				newUnits = Lists.deepCopyArrayListOnly(
 						units, new int[] {
-								oldState.getActiveUnitIndex(), targetIndex});
+								s.getActiveUnitIndex(), targetIndex});
 
-				newFromUnit = newUnits.get(oldState.getActiveUnitIndex());
+				newFromUnit = newUnits.get(s.getActiveUnitIndex());
 				newTargetUnit = newUnits.get(targetIndex);
 
 				newTargetUnit.hp -= newFromUnit.damage;
 
-				result.add(new LazyGameTree(
+				acc.add(new LazyGameTree(
 						new ActionAttackRaged(
 								newFromUnit,
 								units.get(targetIndex),
 								newFromUnit.pos,
 								newFromUnit.damage),
-						Tactics.nextTurn(oldState, newUnits)));
+						Tactics.nextTurn(s, newUnits)));
 			}
 		}
 
-		return result;
+		return acc;
 	}
 
 	@Override

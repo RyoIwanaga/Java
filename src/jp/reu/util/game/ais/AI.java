@@ -77,15 +77,19 @@ public class AI
 		LazyGameTree next;
 
 		//// Force ////
-		// Force tree befor search.
-
+		// Force tree before searching.
+		
 		if (this.level == LEVEL_MAX) {
 			tree.forceRec();
 		} else {
 			tree.forceRec(this.level);
 		}
 
+		// Alpha beta pruning
 		ratings = this.abGetRatings(tree, player, Integer.MIN_VALUE, Integer.MAX_VALUE);
+		// min max
+//		ratings = this.getRatings(tree, player);
+		
 		max_index = 0;
 		max = ratings.get(0);
 
@@ -105,6 +109,9 @@ public class AI
 		}
 
 		next = (LazyGameTree)tree.force().get(max_index);
+	
+		// free
+		tree.desDelete();
 
 		System.out.println();
 

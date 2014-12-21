@@ -3,7 +3,6 @@ package jp.reu.util.lists;
 import java.util.ArrayList;
 import java.util.List;
 
-import jp.reu.product.tactics.units.Unit;
 import jp.reu.util.game.Clone;
 
 public class Lists 

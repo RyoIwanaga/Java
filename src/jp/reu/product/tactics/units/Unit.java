@@ -1,20 +1,17 @@
 package jp.reu.product.tactics.units;
 
 import java.awt.Point;
-import java.lang.Thread.State;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import jp.reu.product.tactics.StateTactics;
 import jp.reu.product.tactics.Tactics;
-import jp.reu.product.tactics.util;
 import jp.reu.product.tactics.actions.ActionAttackMelee;
+import jp.reu.product.tactics.actions.ActionMove;
+import jp.reu.util.game.ActionPass;
 import jp.reu.util.game.Clone;
 import jp.reu.util.game.LazyGameTree;
-import jp.reu.util.lists.Identifer;
 import jp.reu.util.lists.Lists;
 
 public class Unit implements Cloneable, Clone<Unit> {
@@ -75,6 +72,11 @@ public class Unit implements Cloneable, Clone<Unit> {
 		}
 	}
 
+	public int getMeleeDamage()
+	{
+		return this.damage;
+	}
+
 	public boolean isDead()
 	{
 		return this.hp <= 0;
@@ -105,10 +107,26 @@ public class Unit implements Cloneable, Clone<Unit> {
 		return this instanceof UnitRanged;
 	}
 
+	public boolean isSurrounded(List<Unit> units, int width, int height)
+	{
+		Set<Point> neighbors = Tactics.collectRange(
+				this.pos, 1,
+				width,
+				height);
+	
+		// For neighbors
+		for (Point p : neighbors) {
+			// find it
+			if (Tactics.findEnemyUnit(units, p, this.owner) != null)
+				return true;
+		}
+	
+		return false;
+	}
 
 	//// Actions ////
 
-	public LazyGameTree attackMelee(List<Unit> units, int from, int target, StateTactics oldState)
+	public LazyGameTree makeAttackMelee(StateTactics s, List<Unit> units, int from, int target, Point fromP)
 	{
 		List<Unit> newUnits = Lists.deepCopyArrayListOnly(
 				units, new int[] {from, target});
@@ -122,15 +140,93 @@ public class Unit implements Cloneable, Clone<Unit> {
 				new ActionAttackMelee(
 						units.get(from),
 						units.get(target),
-						units.get(from).pos,
+						fromP == null ?
+								s.getActiveUnit().pos : fromP,
 						fromUnit.getMeleeDamage()
 						),
-				Tactics.nextTurn(oldState, newUnits));
+				Tactics.nextTurn(s, newUnits));
 	}
 
-	public int getMeleeDamage()
+	public LazyGameTree makeAttackMelee(StateTactics s, List<Unit> units, int from, int target)
 	{
-		return this.damage;
+		return makeAttackMelee(s, units, from, target, null);
+	}
+
+	public LazyGameTree makeWait(StateTactics s)
+	{
+		return new LazyGameTree(
+				new ActionPass(),
+				Tactics.nextTurn(s, Lists.deepCopyArrayList(s.getUnits())));
+	}
+	
+	public Set<Point> collectMovablePoint(StateTactics s)
+	{
+		Set<Point> moveables = Tactics.collectRange(
+				this.pos,
+				this.speed,
+				s.getBoardWidth(),
+				s.getBoardHeight());
+
+		// Filter point of units
+		moveables.removeAll(Tactics.collectUnitPoints(s.getUnits()));
+		
+		return moveables;
+	}
+
+	public List<LazyGameTree> collectMove (StateTactics s, Set<Point> newPoints)
+	{
+		List<LazyGameTree> acc = new ArrayList<LazyGameTree>();
+		List<Unit> copyUnits; 
+		
+//		for (Point newPoint : newPoints) {
+//			copyUnits = Lists.deepCopyArrayList(s.getUnits());
+			copyUnits = Lists.deepCopyArrayListOnly(s.getUnits(), s.getActiveUnitIndex());
+//			copyUnits.get(s.getActiveUnitIndex()).pos = new Point(newPoint);
+//					
+//			acc.add(new LazyGameTree(
+//					new ActionMove(
+//							s.getActiveUnit(),
+//							s.getActiveUnit().pos, 
+//							new Point(1, 1)),
+//					Tactics.nextTurn(s, copyUnits)));
+//		}
+		
+		return acc;
+	}
+
+	public List<LazyGameTree> collectAttackMeleeMoved (StateTactics s, Set<Point> points)
+	{
+		List<LazyGameTree> acc = new ArrayList<LazyGameTree>();
+		int targetIndex;
+		
+		// for move point
+		for (Point moveP : points) {
+			// collect neighbor
+			Set<Point> neighbors = Tactics.collectRange(
+					moveP,
+					1,
+					s.getBoardWidth(),
+					s.getBoardHeight());
+
+			// For neighbors from move point
+			for (Point p : neighbors) {
+				targetIndex = s.getUnits().indexOf(
+						Tactics.findAttackableUnit(s.getUnits(), p, s.getActiveUnit()));
+
+				// find it!
+				if (targetIndex >= 0) {
+					acc.add(this.makeAttackMelee(
+							s, 
+							s.getUnits(), 
+							s.getActiveUnitIndex(), 
+							targetIndex,
+							p));
+				}
+			}
+		}
+		
+		
+		return acc;
 	}
 
 	public List<LazyGameTree> collectAttackMeleeFromHere (StateTactics s)
@@ -148,12 +244,15 @@ public class Unit implements Cloneable, Clone<Unit> {
 		// For neighbors
 		for (Point p : neighbors) {
 			targetIndex = s.getUnits().indexOf(
-					util.findAttackableUnit(s.getUnits(), p, s.getActiveUnit()));
+					Tactics.findAttackableUnit(s.getUnits(), p, s.getActiveUnit()));
 
 			// find it!
 			if (targetIndex >= 0) {
-				acc.add(this.attackMelee(
-						s.getUnits(), s.getActiveUnitIndex(), targetIndex, s));
+				acc.add(this.makeAttackMelee(
+						s,
+						s.getUnits(), 
+						s.getActiveUnitIndex(), 
+						targetIndex));
 			}
 		}
 		
@@ -163,23 +262,6 @@ public class Unit implements Cloneable, Clone<Unit> {
 	public List<LazyGameTree> collectRangedAttack (StateTactics oldState)
 	{
 		return new ArrayList<LazyGameTree>();
-	}
-
-	public boolean isSurrounded(List<Unit> units, int width, int height)
-	{
-		Set<Point> neighbors = Tactics.collectRange(
-				this.pos, 1,
-				width,
-				height);
-
-		// For neighbors
-		for (Point p : neighbors) {
-			int targetIndex = Tactics.findEnemyUnitIndex(units, p, this.owner);
-
-			if (targetIndex >= 0) return true;
-		}
-
-		return false;
 	}
 
 	@Override

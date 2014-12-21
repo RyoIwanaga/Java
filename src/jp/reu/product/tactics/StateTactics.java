@@ -89,9 +89,9 @@ public class StateTactics extends State
 		int n = 3;
 
 		printDepth(depth);
-		System.out.println("=== Active unit ===");
-		printDepth(depth);
-		this.getActiveUnit().print();
+//		System.out.println("=== Active unit ===");
+//		printDepth(depth);
+//		this.getActiveUnit().print();
 
 		System.out.println();
 
@@ -150,6 +150,7 @@ public class StateTactics extends State
 
 		printDepth(depth);
 		System.out.println("=== Wait List ===");
+		System.out.print("* ");
 		for (int unitIndex : this.wait0) {
 			printDepth(depth);
 			this.units.get(unitIndex).print();

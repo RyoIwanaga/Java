@@ -3,6 +3,7 @@ package jp.reu.util.game;
 import java.util.List;
 import java.util.Scanner;
 
+import jp.reu.util.Memory;
 import jp.reu.util.game.ais.AI;
 import jp.reu.util.lazy.LazyTree;
 
@@ -64,9 +65,9 @@ public abstract class Game
 	public List<Integer> play(LazyGameTree tree, AI[] ais)
 	{
 		int player = tree.getState().getPlayer();
-
+		
 		tree.print();
-
+		
 		if (tree.force().isEmpty()) {
 			this.printWinner(this.winner(tree));
 			return this.winner(tree);

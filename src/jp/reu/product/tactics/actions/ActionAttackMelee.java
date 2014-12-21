@@ -24,14 +24,17 @@ public class ActionAttackMelee extends Action
 
 	@Override
 	public void print() {
-		System.out.printf("%s [%d %d]%s %d hp from (%d %d), %d damage.\n",
+		System.out.printf("%s [%d %d]%s %d hp%s, %d damage.\n",
 				this.text,
 				this.target.pos.x,
 				this.target.pos.y,
 				this.target.name,
 				this.target.hp,
-				this.attackFrom.x,
-				this.attackFrom.y,
+				unit.pos.equals(attackFrom) ?
+						"" :
+						String.format(" from (%d, %d)",
+								this.attackFrom.x,
+								this.attackFrom.y),
 				this.damage);
 	}
 }
