@@ -25,3 +25,261 @@ SDK 22.3
 SELECT 従業員表.所属コード, Count(従業員表.所属コード) AS 所属コードのカウント
 FROM 従業員表
 GROUP BY 従業員表.所属コード;
+
+package jp.reu.product.android.tactics;
+
+import java.util.ArrayList;
+import java.util.Currency;
+import java.util.List;
+
+import javax.microedition.khronos.opengles.GL10;
+
+import jp.reu.andengine.KeyListenScene;
+import jp.reu.andengine.MultiSceneActivity;
+import jp.reu.andengine.ResourceUtil;
+import jp.reu.product.tactics.StateTactics;
+import jp.reu.product.tactics.Tactics;
+import jp.reu.product.tactics.actions.attack.ActionAttack;
+import jp.reu.product.tactics.actions.ActionAttackMelee;
+import jp.reu.product.tactics.units.Unit;
+import jp.reu.product.tactics.units.UnitFootman;
+import jp.reu.util.diagram.Point;
+import jp.reu.util.game.Action;
+import jp.reu.util.game.Game;
+import jp.reu.util.game.LazyGameTree;
+import jp.reu.util.game.ais.AI;
+import jp.reu.util.lazy.LazyTree;
+import jp.reu.util.lists.Lambda;
+import jp.reu.util.lists.Lists;
+
+import org.andengine.entity.scene.IOnSceneTouchListener;
+import org.andengine.entity.scene.Scene;
+import org.andengine.entity.sprite.ButtonSprite;
+import org.andengine.entity.sprite.Sprite;
+import org.andengine.input.touch.TouchEvent;
+import org.andengine.opengl.texture.TextureOptions;
+import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
+import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
+import org.andengine.opengl.texture.region.TextureRegion;
+
+import android.util.Log;
+import android.view.KeyEvent;
+
+public class MainScene extends KeyListenScene
+{
+	static final int UNIT_WIDTH = 80;
+	static final int UNIT_HEIGHT = 80;
+	
+	static final int ZINDEX_FLOOR = 1;
+	static final int ZINDEX_FLOOR_MOVEABLE = 2;
+	static final int ZINDEX_FLOOR_ATTACKABLE = 3;
+	static final int ZINDEX_UNIT = 4;
+	
+	List<Sprite> unitSprites = new ArrayList<Sprite>();
+	List<Sprite> moveSprites = new ArrayList<Sprite>();
+	List<Sprite> activeSprites = new ArrayList<Sprite>();
+	List<Sprite> attackSprites = new ArrayList<Sprite>();
+	Tactics tactics;
+	
+	public MainScene(MultiSceneActivity baseActivity) {
+		super(baseActivity);
+		init();
+	}
+
+	public void init()
+	{
+		// set background
+		attachChild(getBaseActivity().getResourceUtil().getSprite("main_bg.png"));
+		
+		//
+		
+		Log.d("hoge", "first");
+		
+		tactics = new Tactics(9, 5, new Unit[] {
+				new UnitFootman(0, new Point(1, 1)),
+				new UnitFootman(0, new Point(1, 2)),
+				new UnitFootman(0, new Point(1, 3)),
+				new UnitFootman(1, new Point(5, 1)),
+				new UnitFootman(1, new Point(5, 2)),
+				new UnitFootman(1, new Point(5, 3)),
+//				new UnitFootman(1, new Point(0, 0)),
+//				new UnitFootman(0, new Point(0, 1)),
+//				new UnitFootman(0, new Point(0, 2)),
+//				new UnitFootman(0, new Point(0, 3)),
+//				new UnitFootman(0, new Point(0, 4)),
+//				new UnitFootman(0, new Point(1, 2)),
+//				new UnitFootman(0, new Point(2, 2)),
+//				new UnitFootman(0, new Point(3, 2)),
+//				new UnitFootman(0, new Point(4, 2)),
+//				new UnitFootman(0, new Point(5, 2)),
+//				new UnitFootman(0, new Point(6, 2)),
+//				new UnitFootman(0, new Point(7, 2)),
+//				new UnitFootman(0, new Point(8, 2)),
+		});
+		initSprites(tactics.currentNode);
+		
+		play(tactics.currentNode, new AI[] {
+				new AI(Tactics.INSTANCE, 3),
+				new AI(Tactics.INSTANCE, 3),
+		});
+		System.out.println("hoge"); //TODO
+	}
+
+	public void initSprites(LazyGameTree tree)
+	{
+		StateTactics s = (StateTactics) tree.getState();
+		
+		for (int i = 0; i < s.getUnits().size(); i++) {
+			Unit u = s.getUnits().get(i);
+			Sprite uSpirte = getBaseActivity().getResourceUtil().getSprite("unit_2.png");
+
+			unitSprites.add(uSpirte);
+			uSpirte.setTag(i);
+			uSpirte.setZIndex(ZINDEX_UNIT);
+	
+			// Flip enemy unit
+			if (u.owner == 1) {
+				uSpirte.setFlippedHorizontal(true);
+			}
+
+			uSpirte.setPosition(u.pos.x * UNIT_WIDTH, u.pos.y * UNIT_HEIGHT);
+			attachChild(uSpirte);
+			sortChildren();//
+		}
+	}
+	
+	public void drawFloorNotation(LazyGameTree tree)
+	{
+		StateTactics s = (StateTactics) tree.getState();
+		Unit u = s.getActiveUnit();
+		
+		// active unit
+		Sprite activeSprite = getBaseActivity().getResourceUtil().getSprite("floor_active.png");
+		activeSprites.add(activeSprite);
+		activeSprite.setZIndex(ZINDEX_FLOOR_MOVEABLE);
+		
+
+		activeSprite.setPosition(u.pos.x * UNIT_WIDTH, u.pos.y * UNIT_HEIGHT);
+		attachChild(activeSprite);
+		
+					Log.d("hoge", "b");
+		// for movable floor
+		for (Point p : u.collectMovablePoint(s)) {
+			Sprite moveableSpirte = new Sprite(p.x * UNIT_WIDTH, p.y * UNIT_HEIGHT, 
+					(TextureRegion) getBaseActivity().getResourceUtil().getSprite("floor_moveable.png").getTextureRegion(),
+					getBaseActivity().getVertexBufferObjectManager()) {
+				
+				@Override
+				public boolean onAreaTouched(TouchEvent pSceneTouchEvent,
+						float pTouchAreaLocalX, float pTouchAreaLocalY)
+				{
+					Log.d("hoge", "a");
+					return super
+							.onAreaTouched(pSceneTouchEvent, pTouchAreaLocalX, pTouchAreaLocalY);
+				}
+			};
+
+			moveableSpirte.setZIndex(ZINDEX_FLOOR_MOVEABLE);
+			attachChild(moveableSpirte);
+			registerTouchArea(moveableSpirte);
+		}
+		
+		// for attackable points
+		for (Point p: Lists.mapcan(tree.force(), new Lambda<LazyTree, Point>() {
+
+			@Override
+			public Point call(LazyTree o)
+			{
+				Action act = ((LazyGameTree) o).getAction();
+				
+				if (act instanceof ActionAttack) {
+					return ((ActionAttack)act).target.pos;
+				}
+				return null;
+			}
+			
+		})) {
+			Sprite moveableSpirte = getBaseActivity().getResourceUtil().getSprite("floor_attackable.png");
+
+			attackSprites.add(moveableSpirte);
+			moveableSpirte.setZIndex(ZINDEX_FLOOR_MOVEABLE);
+
+			moveableSpirte.setPosition(p.x * UNIT_WIDTH, p.y * UNIT_HEIGHT);
+			attachChild(moveableSpirte);
+		}
+		
+		tree.force();
+		
+		sortChildren();
+	}
+	
+	public void play(LazyGameTree tree, AI[] ais)
+	{
+		int player = tree.getState().getPlayer();
+		
+		drawFloorNotation(tree);
+		
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+//		play(
+//				ais[player].hundleGameTree(tree, player),
+//				ais);
+		
+//		if (tree.force().isEmpty()) {
+//			return;
+//		}
+//		else {
+//			play(
+//					ais[player].hundleGameTree(tree, player),
+//					ais);
+//		}
+		// Play human
+//		else if (ais == null || ais[player] == null){
+//			return this.play(
+//					hundleHuman(tree),
+//					ais);
+//		}
+	}
+	
+	
+
+	@Override
+	public void prepareSoundAndMusic()
+	{
+
+	}
+
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent e)
+	{
+		return false;
+	}
+
+//	@Override
+//	public boolean onSceneTouchEvent(Scene pScene, TouchEvent pSceneTouchEvent)
+//	{
+//		float x = pSceneTouchEvent.getX();
+//		float y = pSceneTouchEvent.getY();
+//		
+//		
+//		if (pSceneTouchEvent.isActionDown()) {
+//			for (Sprite s : moveSprites) {
+//				if (s.contains(x, y)) {
+//					Log.d("a", "a");
+//					
+//					return true;
+//				}
+//			}
+//		} 
+//		else if (pSceneTouchEvent.isActionUp()) {
+//			
+//		}
+//
+//		return true;
+//	}
+}
