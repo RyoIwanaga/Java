@@ -7,8 +7,9 @@ import jp.reu.util.game.Action;
 
 public class ActionMove extends Action
 {
-	Unit unit;
-	Point from, to;
+	public Unit unit;
+	public Point from;
+	public Point  to;
 
 	public ActionMove(Unit unit, Point from, Point to) {
 		this.unit = unit;
