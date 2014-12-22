@@ -24,6 +24,7 @@ public class UnitRanged extends Unit
 		Unit newFromUnit, newTargetUnit;
 		List<Unit> units = s.getUnits();
 		List<Unit> newUnits;
+		int damage = s.getActiveUnit().getRagedDamage();
 
 		for (int targetIndex = 0; targetIndex < units.size(); targetIndex++) {
 
@@ -37,14 +38,14 @@ public class UnitRanged extends Unit
 				newFromUnit = newUnits.get(s.getActiveUnitIndex());
 				newTargetUnit = newUnits.get(targetIndex);
 
-				newTargetUnit.hp -= newFromUnit.damage;
+				newTargetUnit.hp -= damage;
 
 				acc.add(new LazyGameTree(
 						new ActionAttackRaged(
 								newFromUnit,
 								units.get(targetIndex),
 								newFromUnit.pos,
-								newFromUnit.damage),
+								damage),
 						Tactics.nextTurn(s, newUnits)));
 			}
 		}
@@ -56,5 +57,11 @@ public class UnitRanged extends Unit
 	public int getMeleeDamage()
 	{
 		return super.getMeleeDamage() / 2;
+	}
+
+	@Override
+	public int getRagedDamage()
+	{
+		return super.getMeleeDamage();
 	}
 }

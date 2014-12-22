@@ -4,10 +4,15 @@ public class Point
 {
 	public int x;
 	public int y;
-	
+
 	public Point(int x, int y) {
 		this.x = x;
 		this.y = y;
+	}
+
+	public Point(Point p) {
+		this.x = p.x;
+		this.y = p.y;
 	}
 
 	@Override
@@ -33,7 +38,7 @@ public class Point
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		if (this.getClass() != obj.getClass())
 			return false;
 		Point other = (Point) obj;
 		if (this.x != other.x)
@@ -46,9 +51,9 @@ public class Point
 	public static void main(String[] args)
 	{
 		Point p1 = new Point(1, 2);
-		
+
 		System.out.println(p1);
-		
+
 
 	}
 }

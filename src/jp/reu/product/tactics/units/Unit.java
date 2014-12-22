@@ -7,6 +7,7 @@ import java.util.Set;
 import jp.reu.product.tactics.StateTactics;
 import jp.reu.product.tactics.Tactics;
 import jp.reu.product.tactics.actions.ActionAttackMelee;
+import jp.reu.product.tactics.actions.ActionMove;
 import jp.reu.util.diagram.Point;
 import jp.reu.util.game.ActionPass;
 import jp.reu.util.game.Clone;
@@ -73,7 +74,7 @@ public class Unit implements Cloneable, Clone<Unit> {
 
 	public int getMeleeDamage()
 	{
-		return this.damage;
+		return this.damage * this.hp / this.hpMax;
 	}
 
 	public boolean isDead()
@@ -112,14 +113,14 @@ public class Unit implements Cloneable, Clone<Unit> {
 				this.pos, 1,
 				width,
 				height);
-	
+
 		// For neighbors
 		for (Point p : neighbors) {
 			// find it
 			if (Tactics.findEnemyUnit(units, p, this.owner) != null)
 				return true;
 		}
-	
+
 		return false;
 	}
 
@@ -130,10 +131,22 @@ public class Unit implements Cloneable, Clone<Unit> {
 		List<Unit> newUnits = Lists.deepCopyArrayListOnly(
 				units, new int[] {from, target});
 
+		int dealDamage, counterDamage;
+
 		Unit fromUnit = newUnits.get(from);
 		Unit targetUnit = newUnits.get(target);
+		if (fromP != null)
+			fromUnit.pos = new Point(fromP);
+		dealDamage = fromUnit.getMeleeDamage();
 
-		targetUnit.hp -= fromUnit.getMeleeDamage();
+		targetUnit.hp -= dealDamage;
+
+		if (targetUnit.isNotDead()) {
+			counterDamage = targetUnit.getMeleeDamage();
+			fromUnit.hp -= counterDamage;
+		} else {
+			counterDamage = -1;
+		}
 
 		return new LazyGameTree(
 				new ActionAttackMelee(
@@ -141,14 +154,15 @@ public class Unit implements Cloneable, Clone<Unit> {
 						units.get(target),
 						fromP == null ?
 								s.getActiveUnit().pos : fromP,
-						fromUnit.getMeleeDamage()
+						dealDamage,
+						counterDamage
 						),
 				Tactics.nextTurn(s, newUnits));
 	}
 
 	public LazyGameTree makeAttackMelee(StateTactics s, List<Unit> units, int from, int target)
 	{
-		return makeAttackMelee(s, units, from, target, null);
+		return this.makeAttackMelee(s, units, from, target, null);
 	}
 
 	public LazyGameTree makeWait(StateTactics s)
@@ -157,7 +171,7 @@ public class Unit implements Cloneable, Clone<Unit> {
 				new ActionPass(),
 				Tactics.nextTurn(s, Lists.deepCopyArrayList(s.getUnits())));
 	}
-	
+
 	public Set<Point> collectMovablePoint(StateTactics s)
 	{
 		Set<Point> moveables = Tactics.collectRange(
@@ -168,28 +182,27 @@ public class Unit implements Cloneable, Clone<Unit> {
 
 		// Filter point of units
 		moveables.removeAll(Tactics.collectUnitPoints(s.getUnits()));
-		
+
 		return moveables;
 	}
 
 	public List<LazyGameTree> collectMove (StateTactics s, Set<Point> newPoints)
 	{
 		List<LazyGameTree> acc = new ArrayList<LazyGameTree>();
-		List<Unit> copyUnits; 
-		
-//		for (Point newPoint : newPoints) {
-//			copyUnits = Lists.deepCopyArrayList(s.getUnits());
+		List<Unit> copyUnits;
+
+		for (Point newPoint : newPoints) {
 			copyUnits = Lists.deepCopyArrayListOnly(s.getUnits(), s.getActiveUnitIndex());
-//			copyUnits.get(s.getActiveUnitIndex()).pos = new Point(newPoint);
-//					
-//			acc.add(new LazyGameTree(
-//					new ActionMove(
-//							s.getActiveUnit(),
-//							s.getActiveUnit().pos, 
-//							new Point(1, 1)),
-//					Tactics.nextTurn(s, copyUnits)));
-//		}
-		
+			copyUnits.get(s.getActiveUnitIndex()).pos = new Point(newPoint);
+
+			acc.add(new LazyGameTree(
+					new ActionMove(
+						s.getActiveUnit(),
+						s.getActiveUnit().pos,
+						newPoint),
+					Tactics.nextTurn(s, copyUnits)));
+		}
+
 		return acc;
 	}
 
@@ -197,7 +210,7 @@ public class Unit implements Cloneable, Clone<Unit> {
 	{
 		List<LazyGameTree> acc = new ArrayList<LazyGameTree>();
 		int targetIndex;
-		
+
 		// for move point
 		for (Point moveP : points) {
 			// collect neighbor
@@ -215,16 +228,16 @@ public class Unit implements Cloneable, Clone<Unit> {
 				// find it!
 				if (targetIndex >= 0) {
 					acc.add(this.makeAttackMelee(
-							s, 
-							s.getUnits(), 
-							s.getActiveUnitIndex(), 
+							s,
+							s.getUnits(),
+							s.getActiveUnitIndex(),
 							targetIndex,
-							p));
+							moveP));
 				}
 			}
 		}
-		
-		
+
+
 		return acc;
 	}
 
@@ -232,7 +245,7 @@ public class Unit implements Cloneable, Clone<Unit> {
 	{
 		List<LazyGameTree> acc = new ArrayList<LazyGameTree>();
 		int targetIndex;
-		
+
 		// collect neighbor
 		Set<Point> neighbors = Tactics.collectRange(
 				s.getActiveUnit().pos,
@@ -249,12 +262,12 @@ public class Unit implements Cloneable, Clone<Unit> {
 			if (targetIndex >= 0) {
 				acc.add(this.makeAttackMelee(
 						s,
-						s.getUnits(), 
-						s.getActiveUnitIndex(), 
+						s.getUnits(),
+						s.getActiveUnitIndex(),
 						targetIndex));
 			}
 		}
-		
+
 		return acc;
 	}
 
@@ -296,5 +309,10 @@ public class Unit implements Cloneable, Clone<Unit> {
 		units2.get(0).print();
 		units2.get(1).print();
 		System.out.println(units2);
+	}
+
+	public int getRagedDamage()
+	{
+		return 0;
 	}
 }

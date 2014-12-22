@@ -9,9 +9,9 @@ public class UnitArcher extends UnitRanged
 		super(
 				"bow",
 				// hp
-				15,
+				50,
 				// damage
-				6,
+				20,
 				// speed
 				2,
 				// initiative

@@ -9,27 +9,35 @@ public class ActionAttackMelee extends ActionAttack
 {
 	protected String text;
 
-	public ActionAttackMelee(Unit unit, Unit target, Point attackFrom, int damage) {
+	int returnDamage;
+
+	public ActionAttackMelee(Unit unit, Unit target, Point attackFrom, int damage, int returnDamage) {
 		this.unit = unit;
 		this.target = target;
 		this.attackFrom = attackFrom;
 		this.damage = damage;
 		this.text = "Attack";
+		this.returnDamage = returnDamage;
 	}
 
 	@Override
 	public void print() {
-		System.out.printf("%s [%d %d]%s %d hp%s, %d damage.\n",
+		System.out.printf("%s [%d %d]%s %d hp%s, %d damage%s.\n",
 				this.text,
 				this.target.pos.x,
 				this.target.pos.y,
 				this.target.name,
 				this.target.hp,
-				unit.pos.equals(attackFrom) ?
+				this.unit.pos.equals(this.attackFrom) ?
 						"" :
 						String.format(" from (%d, %d)",
 								this.attackFrom.x,
 								this.attackFrom.y),
-				this.damage);
+				this.damage,
+				this.returnDamage < 0 ?
+						"" :
+						String.format(", But resieve counter damage %d",
+								this.returnDamage)
+				);
 	}
 }

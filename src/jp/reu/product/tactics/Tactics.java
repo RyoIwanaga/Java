@@ -23,7 +23,7 @@ public class Tactics extends Game
 	public static final Game INSTANCE = new Tactics();
 
 	protected static final int MAX_UNIT_OWNER = 2;
-	
+
 	public LazyGameTree currentNode;
 
 	@Override
@@ -35,6 +35,12 @@ public class Tactics extends Game
 
 		// Game end ?
 		if (!this.winner(tree).isEmpty()) return result;
+
+		if (activeUnit.isDead()) {
+			// Add pass
+			result.add(activeUnit.makeWait(state));
+			return result;
+		}
 
 		// is surrounded ?
 		boolean isSurrounded = activeUnit.isSurrounded(
@@ -49,7 +55,7 @@ public class Tactics extends Game
 		// Add Melee attack from current position
 		result.addAll(activeUnit.collectAttackMeleeFromHere(state));
 
-		// Add Ranged attack from current position if possible 
+		// Add Ranged attack from current position if possible
 		if (activeUnit.isRanged() && !isSurrounded) {
 			result.addAll(activeUnit.collectRangedAttack(state));
 		}
@@ -57,9 +63,9 @@ public class Tactics extends Game
 		// Add Move action
 		result.addAll(activeUnit.collectMove(state, moveablePoints));
 
-		// Add pass 
+		// Add pass
 		result.add(activeUnit.makeWait(state));
-		
+
 
 		return result;
 	}
@@ -142,7 +148,7 @@ public class Tactics extends Game
 			}
 		});
 	}
-	
+
 	/**
 	 * @return fail -1 or index of units
 	 */
@@ -226,7 +232,7 @@ public class Tactics extends Game
 
 		return score;
 	}
-	
+
 	@Override
 	public List<Integer> play(LazyGameTree tree, AI[] ais)
 	{
@@ -235,15 +241,15 @@ public class Tactics extends Game
 		// TODO Auto-generated method stub
 		return super.play(tree, ais);
 	}
-	
-	private Tactics() 
-	{ 
+
+	private Tactics()
+	{
 		super();
 	}
-	
+
 	public Tactics(int width, int height, Unit[] units)
 	{
-		currentNode = new LazyGameTree(
+		this.currentNode = new LazyGameTree(
 				Tactics.INSTANCE,
 				new StateTactics(width, height, Arrays.asList(units)));
 	}
@@ -265,30 +271,30 @@ public class Tactics extends Game
 		units.add(new UnitFootman(0, new Point(1, 0)));
 		units.add(new UnitFootman(0, new Point(1, 1)));
 		units.add(new UnitFootman(0, new Point(1, 2)));
-		units.add(new UnitFootman(0, new Point(1, 3)));
-		units.add(new UnitFootman(0, new Point(1, 4)));
+//		units.add(new UnitFootman(0, new Point(1, 3)));
+//		units.add(new UnitFootman(0, new Point(1, 4)));
 		units.add(new UnitArcher(0, new Point(0, 0)));
 		units.add(new UnitArcher(0, new Point(0, 1)));
-		units.add(new UnitArcher(0, new Point(0, 2)));
-		units.add(new UnitArcher(0, new Point(0, 3)));
-		units.add(new UnitArcher(0, new Point(0, 4)));
+//		units.add(new UnitArcher(0, new Point(0, 2)));
+//		units.add(new UnitArcher(0, new Point(0, 3)));
+//		units.add(new UnitArcher(0, new Point(0, 4)));
 		units.add(new UnitFootman(1, new Point(6, 0)));
 		units.add(new UnitFootman(1, new Point(6, 1)));
 		units.add(new UnitFootman(1, new Point(6, 2)));
-		units.add(new UnitFootman(1, new Point(6, 3)));
-		units.add(new UnitFootman(1, new Point(6, 4)));
+//		units.add(new UnitFootman(1, new Point(6, 3)));
+//		units.add(new UnitFootman(1, new Point(6, 4)));
 		units.add(new UnitArcher(1, new Point(7, 0)));
 		units.add(new UnitArcher(1, new Point(7, 1)));
-		units.add(new UnitArcher(1, new Point(7, 2)));
-		units.add(new UnitArcher(1, new Point(7, 3)));
-		units.add(new UnitArcher(1, new Point(7, 4)));
+//		units.add(new UnitArcher(1, new Point(7, 2)));
+//		units.add(new UnitArcher(1, new Point(7, 3)));
+//		units.add(new UnitArcher(1, new Point(7, 4)));
 
 		StateTactics state = new StateTactics(8, 5, units);
 		LazyGameTree tree = new LazyGameTree(Tactics.INSTANCE, state);
 //		new Tactics().play(tree);
 		new Tactics().play(tree, new AI[] {
-				new AI(INSTANCE, 5),
-				new AI(INSTANCE, 5)
+				new AI(INSTANCE, 3),
+				new AI(INSTANCE, 3),
 		});
 	}
 }

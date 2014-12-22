@@ -8,9 +8,9 @@ public class UnitFootman extends Unit
 		super(
 				"foot",
 				// hp
-				20,
+				70,
 				// damage
-				7,
+				20,
 				// speed
 				4,
 				// initiative
