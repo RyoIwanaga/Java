@@ -1,18 +1,13 @@
 package jp.reu.product.tactics.actions;
 
 
+import jp.reu.product.tactics.actions.attack.ActionAttack;
 import jp.reu.product.tactics.units.Unit;
 import jp.reu.util.diagram.Point;
-import jp.reu.util.game.Action;
 
-public class ActionAttackMelee extends Action
+public class ActionAttackMelee extends ActionAttack
 {
 	protected String text;
-
-	Unit unit;
-	Unit target;
-	Point attackFrom;
-	int damage;
 
 	public ActionAttackMelee(Unit unit, Unit target, Point attackFrom, int damage) {
 		this.unit = unit;

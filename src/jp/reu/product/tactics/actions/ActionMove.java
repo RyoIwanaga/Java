@@ -1,8 +1,8 @@
 package jp.reu.product.tactics.actions;
 
-import java.awt.Point;
 
 import jp.reu.product.tactics.units.Unit;
+import jp.reu.util.diagram.Point;
 import jp.reu.util.game.Action;
 
 public class ActionMove extends Action

@@ -47,6 +47,8 @@ public class Lists
 		}
 	}
 	
+	//// Higher order functions ////
+	
 	public static <E> List<E> deepCopyArrayList(List<E> elements) 
 	{
 		List<E> copy = new ArrayList<E>();
@@ -114,6 +116,35 @@ public class Lists
 		return null;
 	}
 	
+	public static <T, R> List<R> map(Iterable<T> elements, Lambda<T, R> fn)
+	{
+		List<R> acc = new ArrayList<R>();
+		
+		for(T o : elements) {
+			acc.add(fn.call(o));
+			
+		}
+		
+		return acc;
+	}
+
+	/**
+	 * Add item if its not null
+	 */
+	public static <T, R> List<R> mapcan(Iterable<T> elements, Lambda<T, R> fn)
+	{
+		List<R> acc = new ArrayList<R>();
+		R result;
+		
+		for(T o : elements) {
+			result = fn.call(o);
+			if (result != null) {
+				acc.add(fn.call(o));
+			}
+		}
+		
+		return acc;
+	}
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
