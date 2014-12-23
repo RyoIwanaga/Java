@@ -56,9 +56,10 @@ public class Memory
 	@Override
 	public String toString()
 	{
-		return String.format("MEMORY used / total: %d / %d (%.2f%%) ",
-				this.getUsed(), this.getTotal(),
-				this.getUsed() * 100f / this.getTotal());
+//		return String.format("MEMORY used / total: %d / %d (%.2f%%) ",
+		return String.format("MEM: (%.2f%%) %d / %d ",
+				this.getUsed() * 100f / this.getTotal(),
+				this.getUsed(), this.getTotal());
 	}
 
 	public void print()
