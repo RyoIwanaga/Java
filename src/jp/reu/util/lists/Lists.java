@@ -147,6 +147,13 @@ public class Lists
 		return acc;
 	}
 
+	public static <T> void mapc(Iterable<T> elements, LambdaVoid<T> fn)
+	{
+		for(T o : elements) {
+			fn.call(o);
+		}
+	}
+
 	public static <T> List<T> sublist(Iterable<T> elements, int start, int end)
 	{
 		int i = 0;

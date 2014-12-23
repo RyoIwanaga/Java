@@ -36,11 +36,11 @@ public class Tactics extends Game
 		// Game end ?
 		if (!this.winner(tree).isEmpty()) return result;
 
-		if (activeUnit.isDead()) {
-			// Add pass
-			result.add(activeUnit.makeWait(state));
-			return result;
-		}
+//		if (activeUnit.isDead()) {
+//			// Add pass
+//			result.add(activeUnit.makeWait(state));
+//			return result;
+//		}
 
 		// is surrounded ?
 		boolean isSurrounded = activeUnit.isSurrounded(
