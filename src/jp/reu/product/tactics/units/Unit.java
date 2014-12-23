@@ -6,8 +6,8 @@ import java.util.Set;
 
 import jp.reu.product.tactics.StateTactics;
 import jp.reu.product.tactics.Tactics;
-import jp.reu.product.tactics.actions.ActionAttackMelee;
 import jp.reu.product.tactics.actions.ActionMove;
+import jp.reu.product.tactics.actions.attack.ActionAttackMelee;
 import jp.reu.util.diagram.Point;
 import jp.reu.util.game.ActionPass;
 import jp.reu.util.game.Clone;
@@ -152,6 +152,7 @@ public class Unit implements Cloneable, Clone<Unit> {
 				new ActionAttackMelee(
 						units.get(from),
 						units.get(target),
+						from, target,
 						fromP == null ?
 								s.getActiveUnit().pos : fromP,
 						dealDamage,
@@ -198,6 +199,7 @@ public class Unit implements Cloneable, Clone<Unit> {
 			acc.add(new LazyGameTree(
 					new ActionMove(
 						s.getActiveUnit(),
+						s.getActiveUnitIndex(),
 						s.getActiveUnit().pos,
 						newPoint),
 					Tactics.nextTurn(s, copyUnits)));

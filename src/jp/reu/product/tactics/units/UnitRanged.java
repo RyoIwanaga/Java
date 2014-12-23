@@ -5,7 +5,7 @@ import java.util.List;
 
 import jp.reu.product.tactics.StateTactics;
 import jp.reu.product.tactics.Tactics;
-import jp.reu.product.tactics.actions.ActionAttackRaged;
+import jp.reu.product.tactics.actions.attack.ActionAttackRaged;
 import jp.reu.util.diagram.Point;
 import jp.reu.util.game.LazyGameTree;
 import jp.reu.util.lists.Lists;
@@ -44,6 +44,8 @@ public class UnitRanged extends Unit
 						new ActionAttackRaged(
 								newFromUnit,
 								units.get(targetIndex),
+								s.getActiveUnitIndex(),
+								targetIndex,
 								newFromUnit.pos,
 								damage),
 						Tactics.nextTurn(s, newUnits)));

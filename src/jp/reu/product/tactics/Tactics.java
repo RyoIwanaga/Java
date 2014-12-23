@@ -166,11 +166,20 @@ public class Tactics extends Game
 	{
 		List<Integer> newWaitList = new ArrayList<Integer>(state.getWait0());
 
-		// remove first index
-		newWaitList.remove(0);
+		for (;;) {
+			// remove first index
+			newWaitList.remove(0);
 
-		if (newWaitList.isEmpty()) {
-			newWaitList = makeWaitList(units);
+			if (newWaitList.isEmpty()) {
+				newWaitList = makeWaitList(units);
+			}
+			// next active unit is dead :/
+			else if (state.getUnits().get(newWaitList.get(0)).isDead())
+			{
+				continue;
+			}
+
+			break;
 		}
 
 		return new StateTactics(
