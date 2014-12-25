@@ -7,9 +7,9 @@ import java.util.Set;
 import jp.reu.product.tactics.StateTactics;
 import jp.reu.product.tactics.Tactics;
 import jp.reu.product.tactics.actions.ActionMove;
+import jp.reu.product.tactics.actions.ActionWait;
 import jp.reu.product.tactics.actions.attack.ActionAttackMelee;
 import jp.reu.util.diagram.Point;
-import jp.reu.util.game.ActionPass;
 import jp.reu.util.game.Clone;
 import jp.reu.util.game.LazyGameTree;
 import jp.reu.util.lists.Lists;
@@ -169,7 +169,8 @@ public class Unit implements Cloneable, Clone<Unit> {
 	public LazyGameTree makeWait(StateTactics s)
 	{
 		return new LazyGameTree(
-				new ActionPass(),
+				new ActionWait(s.getActiveUnit(),
+						s.getActiveUnitIndex()),
 				Tactics.nextTurn(s, Lists.deepCopyArrayList(s.getUnits())));
 	}
 
